@@ -1,0 +1,6 @@
+@TheBrickVault.API_HostAddress = http://localhost:5111
+
+GET {{TheBrickVault.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
