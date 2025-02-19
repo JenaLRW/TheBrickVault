@@ -1,0 +1,13 @@
+@inject RebrickableService RebrickableService
+
+<h3>The Brick Vault</h3>
+<p>Subtitle goes here. </p>
+
+@code {
+private LegoSet legoSet;
+
+protected override async Task OnInitializedAsync()
+{
+legoSet = await RebrickableService.GetLegoSetAsync();
+}
+}
