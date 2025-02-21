@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheBrickVault.Core", "TheBrickVault.Core\TheBrickVault.Core.csproj", "{BF927E72-FA22-4F5F-B476-D043848F9186}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheBrickVault.Infrastructure", "TheBrickVault.Infrastructure\TheBrickVault.Infrastructure.csproj", "{0B0573C5-D535-4D12-94C6-3619D8E6C7A6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{43E253EF-5177-4086-BBFF-606DC4AF2F55} = {43E253EF-5177-4086-BBFF-606DC4AF2F55}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheBrickVault.API", "TheBrickVault.API\TheBrickVault.API.csproj", "{43E253EF-5177-4086-BBFF-606DC4AF2F55}"
 EndProject

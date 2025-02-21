@@ -3214,7 +3214,10 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
         "dependencies": {
-          "Newtonsoft.Json": "13.0.3"
+          "Microsoft.EntityFrameworkCore": "7.0.0",
+          "Microsoft.EntityFrameworkCore.Sqlite": "7.0.0",
+          "Newtonsoft.Json": "13.0.3",
+          "Yllibed.HttpServer.Json": "0.9.1"
         },
         "compile": {
           "bin/placeholder/TheBrickVault.Core.dll": {}
