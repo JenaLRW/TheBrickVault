@@ -61,6 +61,8 @@ BenchmarkDotNet.Artifacts/
 project.lock.json
 project.fragment.lock.json
 artifacts/
+TheBrickVault\appsettings.json
+TheBrickVault/appsettings.json
 
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
