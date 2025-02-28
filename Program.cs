@@ -1,10 +1,11 @@
 
 using Microsoft.EntityFrameworkCore;
 using TheBrickVault.Infrastructure.Data;
-
+using System.Net.Http;
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using TheBrickVault.Services;
+
 
 
 namespace TheBrickVault
@@ -25,14 +26,14 @@ namespace TheBrickVault
             builder.Services.AddDbContext<LegoDbContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            
-            //builder.Services.AddHttpClient("RebrickableClient", client =>
-            //{
-            //    client.BaseAddress = new Uri("https://rebrickable.com/api/v3/");
-            //    var apiKey = builder.Configuration["Rebrickable:ApiKey"];
-            //    client.DefaultRequestHeaders.Add("Authorization", $"key {apiKey}");
-            //},
-            
+            //Add HttpClient for Rebrickable API
+            builder.Services.AddHttpClient("RebrickableClient", client =>
+            {
+                client.BaseAddress = new Uri("https://rebrickable.com/api/v3/");
+                var apiKey = builder.Configuration["Rebrickable:ApiKey"];
+                client.DefaultRequestHeaders.Add("Authorization", $"key {apiKey}");
+            },
+
             builder.Services.AddSingleton<RebrickableSettings>(provider =>
             {
                 string apiKey = builder.Configuration.GetValue<string>("Rebrickable:ApiKey");
