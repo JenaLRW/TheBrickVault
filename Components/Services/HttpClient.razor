@@ -1,0 +1,15 @@
+﻿<h3>HttpClient</h3>
+@inject IHttpClientFactory HttpClientFactory
+
+
+@code {
+    private string RebrickableClient;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var client = HttpClientFactory.CreateClient("Rebrickable");
+        RebrickableClient = await client.GetStringAsync("api/v3/lego/sets/75290-1");
+       
+
+}
+}
