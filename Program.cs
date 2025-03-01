@@ -26,14 +26,21 @@ namespace TheBrickVault
             builder.Services.AddDbContext<LegoDbContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            //Add HttpClient for Rebrickable API
+            builder.Services.AddScoped(sp =>
+            new HttpClient 
+            { 
+                BaseAddress = new Uri(builder.Configuration["https://rebrickable.com/api/v3/"] ?? "https://localhost:5002")
+            });
+                       
             builder.Services.AddHttpClient("RebrickableClient", client =>
             {
                 client.BaseAddress = new Uri("https://rebrickable.com/api/v3/");
                 var apiKey = builder.Configuration["Rebrickable:ApiKey"];
                 client.DefaultRequestHeaders.Add("Authorization", $"key {apiKey}");
-            },
+            });
 
+            
+            // Call the API
             builder.Services.AddSingleton<RebrickableSettings>(provider =>
             {
                 string apiKey = builder.Configuration.GetValue<string>("Rebrickable:ApiKey");
@@ -42,24 +49,33 @@ namespace TheBrickVault
                     ApiKey = apiKey
                 };
                 return rebrickableSettings;
-            }));
+            });
+
+            builder.Services.AddSignalR();
+
+            builder.Services.AddServerSideBlazor();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+
+            //HTTP request pipeline
             if (app.Environment.IsDevelopment())
             {
-                app.MapOpenApi();
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Error");
+                app.UseHsts();
             }
 
-            
-            
-            //var config = builder.Configuration;
-            //builder.Services.Configure<RebrickableSettings>(config.GetSection("Rebrickable"));
-
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
 
+            app.UseRouting();
 
+            app.MapBlazorHub();
+            app.MapFallbackToPage("/_Host");
 
             app.Run();
 
