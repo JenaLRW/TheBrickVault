@@ -29,12 +29,12 @@ namespace TheBrickVault
             builder.Services.AddScoped(sp =>
             new HttpClient 
             { 
-                BaseAddress = new Uri(builder.Configuration["https://rebrickable.com/api/v3/"] ?? "https://localhost:5002")
+                BaseAddress = new Uri(builder.Configuration["Rebrickable:https://rebrickable.com/api/v3/"] ?? "https://localhost:5002")
             });
                        
             builder.Services.AddHttpClient("RebrickableClient", client =>
             {
-                client.BaseAddress = new Uri("https://rebrickable.com/api/v3/");
+                client.BaseAddress = new Uri("Rebrickable:https://rebrickable.com/api/v3/");
                 var apiKey = builder.Configuration["Rebrickable:ApiKey"];
                 client.DefaultRequestHeaders.Add("Authorization", $"key {apiKey}");
             });
@@ -53,6 +53,9 @@ namespace TheBrickVault
 
             builder.Services.AddSignalR();
 
+            builder.Services.AddRazorPages();
+
+
             builder.Services.AddServerSideBlazor();
 
             var app = builder.Build();
@@ -68,12 +71,14 @@ namespace TheBrickVault
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
+            app.UseStaticFiles();
+            app.UseRouting();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.MapRazorPages();
             app.MapBlazorHub();
             app.MapFallbackToPage("/_Host");
 
