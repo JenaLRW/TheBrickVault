@@ -1,0 +1,63 @@
+﻿namespace TheBrickVault.wwwroot.CSS
+{
+    public class navmenu
+    {
+    }
+}
+
+
+ wwwroot/css/site.css 
+
+/* Style for the top row */
+.top-row {
+    background-color: #343a40;
+    color: white;
+    padding: 10px 0;
+}
+
+/* Style for the navbar brand */
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Style for the navbar toggler */
+.navbar-toggler {
+    display: none; /* Hide the checkbox by default */
+}
+
+/* Style for the navigation menu */
+.nav-scrollable {
+    background-color: #343a40;
+    color: white;
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
+}
+
+/* Show the navigation menu when the checkbox is checked */
+.navbar-toggler:checked + .nav-scrollable {
+    transform: translateX(0);
+}
+
+/* Style for the nav links */
+.nav-link {
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+}
+
+    .nav-link:hover {
+        background-color: #495057;
+        color: white;
+    }
+
+/* Style for the nav items */
+.nav-item {
+    border-bottom: 1px solid #495057;
+}
