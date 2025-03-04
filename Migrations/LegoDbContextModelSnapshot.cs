@@ -39,8 +39,9 @@ namespace TheBrickVault.Migrations
                     b.Property<int>("PieceCount")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("SetNum")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("SetNum")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 

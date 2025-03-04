@@ -18,6 +18,20 @@ namespace TheBrickVault.Infrastructure.Data
         {
             modelBuilder.Entity<LegoSet>().HasKey(s => s.Id);
         }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                var configuration = new ConfigurationBuilder()
+                    .SetBasePath(AppContext.BaseDirectory)
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .Build();
+
+                string connectionString = configuration.GetConnectionString("DefaultConnection");
+                optionsBuilder.UseSqlite(connectionString);
+            }
+        }
     }
 }
 
