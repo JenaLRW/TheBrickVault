@@ -23,10 +23,12 @@ namespace TheBrickVault
 
             var builder = WebApplication.CreateBuilder(args);
 
+            //to fully qualify the path to the appsettings.json file
+            
 
             //Database file
             builder.Services.AddDbContext<LegoDbContext>(options =>
-                options.UseSqlite(builder.Configuration.GetConnectionString("Data Source=TheBrickVault.db")));
+                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
             // Rebrickable API
