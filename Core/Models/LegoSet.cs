@@ -9,7 +9,7 @@ namespace TheBrickVault.Core.Models
         public int Id { get; set; } //might delete this if SetNumber is sufficient. Or use this to number/list the current sets the user has. 
         public string Name { get; set; }
         //do SetNumber first and only to see the Db build successfully then add the rest. 
-        public int SetNum { get; set; }
+        public string SetNum { get; set; }  //had to set it as string
         public string Images { get; set; }
         public int PieceCount { get; set; }
 

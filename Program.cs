@@ -23,15 +23,21 @@ namespace TheBrickVault
 
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddDbContext<LegoDbContext>(options =>
-                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            //Database file
+            builder.Services.AddDbContext<LegoDbContext>(options =>
+                options.UseSqlite(builder.Configuration.GetConnectionString("Data Source=TheBrickVault.db")));
+
+
+            // Rebrickable API
             builder.Services.AddScoped(sp =>
             new HttpClient 
             { 
                 BaseAddress = new Uri(builder.Configuration["Rebrickable:https://rebrickable.com/api/v3/"] ?? "https://localhost:5002")
             });
-                       
+            
+            
+            //HttpClient 
             builder.Services.AddHttpClient("RebrickableClient", client =>
             {
                 client.BaseAddress = new Uri("Rebrickable:https://rebrickable.com/api/v3/");
@@ -40,7 +46,7 @@ namespace TheBrickVault
             });
 
             
-            // Call the API
+            // Rebrickable Settings
             builder.Services.AddSingleton<RebrickableSettings>(provider =>
             {
                 string apiKey = builder.Configuration.GetValue<string>("Rebrickable:ApiKey");
@@ -52,6 +58,7 @@ namespace TheBrickVault
             });
 
             builder.Services.AddSignalR();
+
 
             builder.Services.AddRazorPages();
 
@@ -71,6 +78,7 @@ namespace TheBrickVault
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
+            
             app.UseStaticFiles();
             app.UseRouting();
 

@@ -17,7 +17,7 @@ namespace TheBrickVault.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
-                    SetNum = table.Column<int>(type: "INTEGER", nullable: false),
+                    SetNum = table.Column<string>(type: "TEXT", nullable: false),
                     Images = table.Column<string>(type: "TEXT", nullable: false),
                     PieceCount = table.Column<int>(type: "INTEGER", nullable: false),
                     Instructions = table.Column<int>(type: "INTEGER", nullable: false),
