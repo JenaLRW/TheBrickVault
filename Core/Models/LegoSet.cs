@@ -10,11 +10,12 @@ namespace TheBrickVault.Core.Models
         public string Name { get; set; }
         //do SetNumber first and only to see the Db build successfully then add the rest. 
         public string SetNum { get; set; }  //had to set it as string
-        public string Images { get; set; }
-        public int PieceCount { get; set; }
 
-        public int Instructions { get; set; } //might need to change type to string.
-        public int PartsList { get; set; } //not sure if type is int or string. 
+        public string? Images { get; set; }  //NOT IMPORTANT RIGHT NOW
+        public int? PieceCount { get; set; }
+
+        public int? Instructions { get; set; } //might need to change type to string.
+        public int? PartsList { get; set; } //not sure if type is int or string. 
 
     }
 }
