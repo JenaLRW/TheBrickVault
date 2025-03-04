@@ -7,8 +7,8 @@ namespace TheBrickVault.Core.Models
     public class LegoSet
     {
         public int Id { get; set; } //might delete this if SetNumber is sufficient. Or use this to number/list the current sets the user has. 
-        public string Name { get; set; }
-        //do SetNumber first and only to see the Db build successfully then add the rest. 
+        public string? Name { get; set; }
+        //do SetNum first and only to see the Db build successfully then add the rest. 
         public string SetNum { get; set; }  //had to set it as string
 
         public string? Images { get; set; }  //NOT IMPORTANT RIGHT NOW
