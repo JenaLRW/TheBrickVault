@@ -28,7 +28,8 @@ namespace TheBrickVault.Infrastructure.Data
                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                     .Build();
 
-                string connectionString = configuration.GetConnectionString("Data Source");
+                //string connectionString = configuration.GetConnectionString("Data Source=@C:\\Users\\jenal\\source\\repos\\TheBrickVault\\TheBrickVault.db");
+                string connectionString = configuration.GetConnectionString("DefaultConnection");
                 optionsBuilder.UseSqlite(connectionString);
             }
         }

@@ -10,7 +10,7 @@ using TheBrickVault.Infrastructure.Data;
 namespace TheBrickVault.Migrations
 {
     [DbContext(typeof(LegoDbContext))]
-    [Migration("20250304032343_InitialCreate")]
+    [Migration("20250304161707_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
