@@ -5,6 +5,7 @@ using System.Net.Http;
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using TheBrickVault.Services;
+using TheBrickVault.Infrastructure;
 
 
 
@@ -23,12 +24,15 @@ namespace TheBrickVault
 
             var builder = WebApplication.CreateBuilder(args);
 
-            //to fully qualify the path to the appsettings.json file
+            
             
 
             //Database file
             builder.Services.AddDbContext<LegoDbContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            //LegoSetService Registration
+            builder.Services.AddScoped<LegoSetService>();
 
 
             // Rebrickable API
@@ -69,9 +73,14 @@ namespace TheBrickVault
 
             var app = builder.Build();
 
+            using (var scope = app.Services.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<LegoDbContext>();
+                DbInitializer.Initialize(dbContext);
+            }
 
-            //HTTP request pipeline
-            if (app.Environment.IsDevelopment())
+                //HTTP request pipeline
+                if (app.Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }

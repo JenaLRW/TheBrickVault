@@ -1,7 +1,80 @@
-﻿@page "/"
+﻿@using TheBrickVault.Services
+@using TheBrickVault.Core.Models
+
+
+@page "/"
+@inject LegoSetService LegoSetService
+
 
 <h3>The Brick Vault</h3>
 <h5>Jena White's Capstone Project</h5>
 <h5>Code:You, August 2024 Cohort</h5>
 
 <img src="images/Thebrickvaultlogo.png" alt="image of a chest full of colorful bricks" style="width: 200px; height: auto; place-content: left"/>
+
+
+@if (LegoSetService == null)
+{
+<p>Loading...</p>
+}
+else if (LegoSets == null)
+{
+    <p>No Lego sets found. </p>
+}
+else
+{
+<table class="table">
+    <thead>
+                <tr>
+            <th scope="col">Set Number</th>
+            <th scope="col">Name</th>
+            <th scope="col">Number of Pieces</th>
+        </tr>
+    </thead>
+    <tbody>
+            @foreach (var legoSet in LegoSets)
+            {
+                <tr>
+                    <td>@legoSet.SetNum</td>
+                    <td>@legoSet.Name</td>
+                    <td>@legoSet.PieceCount</td>
+                </tr>
+            }
+    </tbody>
+</table>
+}
+<h3>Add New Lego Set</h3>
+<EditForm Model="@newLegoSet" OnValidSubmit="@AddLegoSetAsync">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label for="setNumber">Set Number:</label>
+        <InputText id="setNum" class="form-control" @bind-Value="@newLegoSet.SetNum" />
+    </div>
+    <div class="form-group">
+        <label for="name">Name:</label>
+        <InputText id="name" class="form-control" @bind-Value="@newLegoSet.Name" />
+    </div>
+    <div class="form-group">
+        <label for="numberOfPieces">Number of Pieces:</label>
+        <InputNumber id="pieceCount" class="form-control" @bind-Value="@newLegoSet.PieceCount" />
+    </div>
+    <button type="submit" class="btn btn-primary">Add Lego Set</button>"
+    </EditForm>
+
+ @code {
+    
+    private List<LegoSet> LegoSets = new();
+    private LegoSet newLegoSet = new LegoSet();
+
+    protected override async Task OnInitializedAsync()
+    {
+        LegoSets = await LegoSetService.GetLegoSetsAsync();
+    }
+    private async Task AddLegoSetAsync()
+    {
+        await LegoSetService.AddLegoSetAsync(newLegoSet);
+        newLegoSet = new LegoSet(); // Reset the form
+        LegoSets = await LegoSetService.GetLegoSetsAsync(); // Refresh the list
+    }
+ }

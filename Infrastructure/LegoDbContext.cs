@@ -17,6 +17,16 @@ namespace TheBrickVault.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<LegoSet>().HasKey(s => s.Id);
+            modelBuilder.Entity<LegoSet>().Property(s => s.SetNum).IsRequired().HasMaxLength(6); 
+
+
+            //Seed data for testing
+            //modelBuilder.Entity<LegoSet>().HasData(
+            //    new LegoSet { Id = 6, SetNum = "123", Name = "Test Set" },
+            //    new LegoSet { Id = 7, SetNum = "5678", Name = "Another Test Set" },
+            //    new LegoSet { Id = 8, SetNum = "91011593598", Name = "Yet Another Test Set" },
+            //    new LegoSet { Id = 9, SetNum = "1", Name = "" }
+        //);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -28,7 +38,6 @@ namespace TheBrickVault.Infrastructure.Data
                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                     .Build();
 
-                //string connectionString = configuration.GetConnectionString("Data Source=@C:\\Users\\jenal\\source\\repos\\TheBrickVault\\TheBrickVault.db");
                 string connectionString = configuration.GetConnectionString("DefaultConnection");
                 optionsBuilder.UseSqlite(connectionString);
             }
