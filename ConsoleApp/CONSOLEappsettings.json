@@ -1,4 +1,5 @@
-//BLAZOR WEB APP APPSETTINGS FILE
+//CONSOLE APP APPSETTINGS FILE
+
 
 {
   "DetailedErrors": true,
@@ -14,8 +15,11 @@
   "Rebrickable": {
     "BaseUrl": "https://rebrickable.com/api/v3/lego/",
     "ApiKey": "Your-API-key-here"
-  },
-
+  }
+//  "ConnectionStrings": {
+//    "DefaultConnection": "Data Source=C:\\Users\\jenal\\source\\repos\\TheBrickVault\\TheBrickVault.db"
+//  }
+//}
   "ConnectionStrings": {
     "DefaultConnection": "Data Source=./TheBrickVault.db"
   }
