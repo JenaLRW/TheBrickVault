@@ -1,4 +1,4 @@
-﻿namespace TheBrickVault.Services
+﻿namespace TheBrickVault.Components.Services
 {
     public class RebrickableSettings
     {

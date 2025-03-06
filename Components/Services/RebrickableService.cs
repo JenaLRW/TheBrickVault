@@ -4,10 +4,9 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TheBrickVault.Core.Models;
-using TheBrickVault.Services;
 
 
-namespace TheBrickVault.Services
+namespace TheBrickVault.Components.Services
 {
     public class RebrickableService
     {
