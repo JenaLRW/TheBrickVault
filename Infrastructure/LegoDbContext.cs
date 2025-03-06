@@ -10,7 +10,10 @@ namespace TheBrickVault.Infrastructure.Data
 {
     public class LegoDbContext : DbContext
     {
-        public LegoDbContext(DbContextOptions<LegoDbContext> options) : base(options) { }
+        public LegoDbContext(DbContextOptions<LegoDbContext> options) : base(options) 
+        {
+            LegoSets = Set<LegoSet>();
+        }
 
         public DbSet<LegoSet> LegoSets { get; set; }
 

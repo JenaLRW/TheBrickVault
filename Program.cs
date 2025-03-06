@@ -4,8 +4,8 @@ using TheBrickVault.Infrastructure.Data;
 using System.Net.Http;
 using System;
 using Microsoft.Extensions.DependencyInjection;
-using TheBrickVault.Services;
 using TheBrickVault.Infrastructure;
+using TheBrickVault.Components.Services;
 
 
 
@@ -18,14 +18,15 @@ namespace TheBrickVault
         // Main Method
         public static void Main(String[] args)
         {
-
             Console.WriteLine("Main Method");
 
 
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddRazorPages();
+            builder.Services.AddServerSideBlazor();
             
-            
+
 
             //Database file
             builder.Services.AddDbContext<LegoDbContext>(options =>
@@ -63,7 +64,7 @@ namespace TheBrickVault
                 return rebrickableSettings;
             });
 
-            builder.Services.AddSignalR();
+            
 
 
             builder.Services.AddRazorPages();
@@ -79,8 +80,8 @@ namespace TheBrickVault
                 DbInitializer.Initialize(dbContext);
             }
 
-                //HTTP request pipeline
-                if (app.Environment.IsDevelopment())
+            //HTTP request pipeline
+            if (app.Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -92,6 +93,8 @@ namespace TheBrickVault
             
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseAuthorization();
+            app.UseAuthentication();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

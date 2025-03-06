@@ -1,4 +1,5 @@
-﻿@page "/"
+﻿@page "/host"
+
 
 @namespace TheBrickVault.Components.Pages
 
@@ -14,8 +15,7 @@
     <link rel="stylesheet" href="css/site.css" />
 </head>
 <body>
-    <component type="typeof(App)" render-mode="ServerPrerendered" /> @*might need to be WebAssemblyPrerendered instead.*@
-
+    <component type="typeof(App)" render-mode="Server" /> 
     <script src="_framework/blazor.server.js"></script>
 </body>
 </html>

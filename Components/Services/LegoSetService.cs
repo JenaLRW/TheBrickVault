@@ -4,16 +4,12 @@ using TheBrickVault.Core.Models;
 
 
 
-namespace TheBrickVault.Services
+namespace TheBrickVault.Components.Services
 {
-    public class LegoSetService
+    public class LegoSetService(LegoDbContext context)
     {
-        private readonly LegoDbContext _context;
-        public LegoSetService(LegoDbContext context)
-        {
-            _context = context;
+        private readonly LegoDbContext _context = context;
 
-        }
         public async Task<LegoSet> GetLegoSetByIdAsync(int id)
         {
             return await _context.LegoSets.FindAsync(id);
