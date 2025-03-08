@@ -4,6 +4,9 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TheBrickVault.Core.Models;
+using Microsoft.Extensions.Configuration;
+using System.Security.Cryptography.X509Certificates;
+
 
 
 namespace TheBrickVault.Components.Services
@@ -22,10 +25,35 @@ namespace TheBrickVault.Components.Services
     //converting the data into a format that can be used by the application.
     public class RebrickableService
     {
-        private readonly HttpClient _httpClient; //IHttpClientFactory _clientFactory; is for more complex scenarios and I am not doing that here. 
-        private readonly string _apiKey; 
+        private readonly IHttpClientFactory _clientFactory;
+        private readonly IConfiguration _configuration;
+
+        public RebrickableService(IHttpClientFactory httpClient, IConfiguration apiKey)
+        {
+            _clientFactory = httpClient;
+            //this is to get the API key from UserSecrets
+            _configuration = apiKey;
+        }
+
+        //use HttpClient to connect to Rebrickable's API endpoints and search for Lego sets.
+        public async Task<string> GetLegoSetAsync(string searchQuery)
+        {
+            var client = _clientFactory.CreateClient("RebrickableClient");
+            var response = await client.GetAsync($"lego/sets/?search={searchQuery}");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                return content;
+            }
+            return "Error retrieving data.";
+
+        }
 
     }
+
+
+
+
 
     // old design.  trying a new design and keeping old design in case the new is a fail.
 

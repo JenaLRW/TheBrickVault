@@ -1,5 +1,5 @@
 ﻿namespace TheBrickVault.Components.Services
-{
+{ // Not sure if i need this class. 
     public class RebrickableSettings
     {
         public string ApiKey { get; set; }
@@ -8,11 +8,11 @@
             ApiKey = string.Empty;
         }
 
-        public string GetApiKey()
-        {
+        //public string GetApiKey()
+        //{
 
-            return ApiKey;
-        }
+        //    return ApiKey;
+        //}
 
 
 
