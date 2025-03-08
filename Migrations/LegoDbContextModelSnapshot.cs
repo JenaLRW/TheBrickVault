@@ -45,32 +45,6 @@ namespace TheBrickVault.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("LegoSets");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 6,
-                            Name = "Test Set",
-                            SetNum = "123"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Name = "Another Test Set",
-                            SetNum = "5678"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Name = "Yet Another Test Set",
-                            SetNum = "91011593598"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Name = "",
-                            SetNum = "1"
-                        });
                 });
 #pragma warning restore 612, 618
         }

@@ -24,16 +24,20 @@ namespace TheBrickVault
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddRazorPages();
-            builder.Services.AddServerSideBlazor();
-            
+            builder.Services.AddServerSideBlazor(); //Blazor Server application
 
+            //this makes sure the secrets (API key) are loaded before the app starts using configuration values. 
+            if (builder.Environment.IsDevelopment()) 
+            {
+                builder.Configuration.AddUserSecrets<Program>();
+            }
 
             //Database file
             builder.Services.AddDbContext<LegoDbContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             //LegoSetService Registration
-            builder.Services.AddScoped<LegoSetService>();
+            //builder.Services.AddScoped<LegoSetService>();
 
 
             // Rebrickable API
@@ -74,16 +78,17 @@ namespace TheBrickVault
 
             var app = builder.Build();
 
-            using (var scope = app.Services.CreateScope())
-            {
-                var dbContext = scope.ServiceProvider.GetRequiredService<LegoDbContext>();
-                DbInitializer.Initialize(dbContext);
-            }
+            //using (var scope = app.Services.CreateScope())
+            //{
+            //    var dbContext = scope.ServiceProvider.GetRequiredService<LegoDbContext>();
+            //    DbInitializer.Initialize(dbContext);
+            //}
 
             //HTTP request pipeline
             if (app.Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
             }
             else
             {
@@ -103,6 +108,16 @@ namespace TheBrickVault
             app.MapRazorPages();
             app.MapBlazorHub();
             app.MapFallbackToPage("/_Host");
+
+            
+
+            //delete all records from the database
+            using (var scope = app.Services.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<LegoDbContext>();
+                dbContext.LegoSets.RemoveRange(dbContext.LegoSets);
+                dbContext.SaveChanges();
+            }
 
             app.Run();
 
