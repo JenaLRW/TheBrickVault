@@ -4,7 +4,7 @@
 
 
 @page "/"
-@inject LegoSetService LegoSetService
+@* @inject LegoSetService LegoSetService*@
 
 
 <h3>The Brick Vault</h3>
@@ -14,6 +14,12 @@
 <img src="images/Thebrickvaultlogo.png" alt="image of a chest full of colorful bricks" style="width: 200px; height: auto; place-content: left"/>
 
 
+
+
+
+
+
+@* old design, going with something else but holding on to this in case new design is a fail.
 @if (LegoSetService == null)
 {
 <p>Loading...</p>
@@ -23,8 +29,8 @@ else if (LegoSets == null)
     <p>No Lego sets found. </p>
 }
 else
-{
-<table class="table">
+{ *@
+@* <table class="table">
     <thead>
                 <tr>
             <th scope="col">Set Number</th>
@@ -42,7 +48,27 @@ else
                 </tr>
             }
     </tbody>
-</table>
+</table> 
+    <h3>Lego Sets</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Set Number</th>
+                <th>Name</th>
+                <th>Number of Pieces</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var set in LegoSets)
+            {
+                <tr>
+                    <td>@set.SetNum</td>
+                    <td>@set.Name</td>
+                    <td>@set.PieceCount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
 <h3>Add New Lego Set</h3>
 <EditForm Model="@newLegoSet" OnValidSubmit="@AddLegoSetAsync">
@@ -60,14 +86,17 @@ else
         <label for="numberOfPieces">Number of Pieces:</label>
         <InputNumber id="pieceCount" class="form-control" @bind-Value="@newLegoSet.PieceCount" />
     </div>
-    @*need to add some padding*@
+    need to add some padding
     <button type="submit" class="btn btn-primary">Add Lego Set</button>
     </EditForm>
 
  @code {
     
-    private List<LegoSet> LegoSets = new();
+    
     private LegoSet newLegoSet = new LegoSet();
+    private List<LegoSet> LegoSets = new();
+
+  
 
     protected override async Task OnInitializedAsync()
     {
@@ -75,8 +104,10 @@ else
     }
     private async Task AddLegoSetAsync()
     {
+        Console.WriteLine($"Adding LegoSet - Name: {newLegoSet.Name}, SetNum: {newLegoSet.SetNum}, Pieces: {newLegoSet.PieceCount}");
         await LegoSetService.AddLegoSetAsync(newLegoSet);
         newLegoSet = new LegoSet(); // Reset the form
         LegoSets = await LegoSetService.GetLegoSetsAsync(); // Refresh the list
     }
  }
+ *@
