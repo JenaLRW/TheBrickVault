@@ -24,7 +24,7 @@ namespace TheBrickVault
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddRazorPages();
-            builder.Services.AddServerSideBlazor(); //Blazor Server application
+            builder.Services.AddServerSideBlazor(); //Blazor Server application, not WebAssembly. 
 
             //this makes sure the secrets (API key) are loaded before the app starts using configuration values. 
             if (builder.Environment.IsDevelopment()) 
@@ -36,8 +36,9 @@ namespace TheBrickVault
             builder.Services.AddDbContext<LegoDbContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            //LegoSetService Registration
-            //builder.Services.AddScoped<LegoSetService>();
+            //LegoSetService API Key configuration
+            builder.Services.AddScoped<RebrickableService>();
+
 
 
             // Rebrickable API
@@ -57,16 +58,16 @@ namespace TheBrickVault
             });
 
             
-            // Rebrickable Settings
-            builder.Services.AddSingleton<RebrickableSettings>(provider =>
-            {
-                string apiKey = builder.Configuration.GetValue<string>("Rebrickable:ApiKey");
-                var rebrickableSettings = new RebrickableSettings
-                {
-                    ApiKey = apiKey
-                };
-                return rebrickableSettings;
-            });
+            // Rebrickable Settings, not sure if I need this. 
+            //builder.Services.AddSingleton<RebrickableSettings>(provider =>
+            //{
+            //    string apiKey = builder.Configuration.GetValue<string>("Rebrickable:ApiKey");
+            //    var rebrickableSettings = new RebrickableSettings
+            //    {
+            //        ApiKey = apiKey
+            //    };
+            //    return rebrickableSettings;
+            //});
 
             
 
