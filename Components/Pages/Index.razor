@@ -13,13 +13,13 @@
 <h5>Code:You, August 2024 Cohort</h5>
 
 <img src="images/Thebrickvaultlogo.png" alt="image of a chest full of colorful bricks" style="width: 200px; 
-height: auto; place-content: left"/>
-@* insert padding here *@
+height: auto; place-content: left; padding: 10px;"/>
 
-<h3> Search Lego Sets </h3>
+
+<h6> Search Lego Sets </h6>
 
 <InputText @bind-Value="searchQuery" placeholder="Search by Set Number or Name" class="form-control" />
-<button class="btn btn-primary" @onclick="SearchLegoSets">Search</button>
+<button class="btn btn-primary" @onclick="SearchLegoSets" style="margin: 10px;">Search</button>
 
 @if (legoSets != null && legoSets.Count > 0)
 {

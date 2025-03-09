@@ -24,6 +24,7 @@ namespace TheBrickVault
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddRazorPages();
+            builder.Services.AddRazorComponents();
             builder.Services.AddServerSideBlazor(); //Blazor Server application, not WebAssembly. 
 
             //this makes sure the secrets (API key) are loaded before the app starts using configuration values. 
@@ -113,8 +114,9 @@ namespace TheBrickVault
             app.MapRazorPages();
             app.MapBlazorHub();
             app.MapFallbackToPage("/_Host");
-
             
+
+
 
             //delete all records from the database
             using (var scope = app.Services.CreateScope())
