@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 
 namespace TheBrickVault.Core.Models
 {
+
+    //this is a model that represents a lego set stored in the app's db. This is used to store and manage Lego sets 
+    //in the user's collection separate from the Rebrickable API data.
     public class LegoSet
     {
         public int Id { get; set; } //might delete this if SetNumber is sufficient. Or use this to number/list the current sets the user has. 

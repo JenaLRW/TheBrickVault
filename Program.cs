@@ -7,7 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using TheBrickVault.Infrastructure;
 using TheBrickVault.Components.Services;
 
-
+//This is the entry point for the app.  Configures services (EF Core with SQLite, HttpClient, DI, etc). 
+//Sets up Blazor's rendering mode. Registers Rebrickable's API integration components. 
 
 namespace TheBrickVault
 {
