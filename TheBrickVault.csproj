@@ -4,6 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+	  <UserSecretsId>aspnet-TheBrickVault-1A2B3C4D-5E6F-7G8H-9I0J-K1L2M3N4O5P6</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
