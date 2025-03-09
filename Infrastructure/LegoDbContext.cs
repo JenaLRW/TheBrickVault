@@ -20,7 +20,7 @@ namespace TheBrickVault.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<LegoSet>().HasKey(s => s.Id);
-            modelBuilder.Entity<LegoSet>().Property(s => s.SetNum).IsRequired().HasMaxLength(6); 
+            modelBuilder.Entity<LegoSet>().Property(s => s.SetNum).IsRequired().HasMaxLength(20); 
 
 
             //Seed data for testing

@@ -1,11 +1,14 @@
 ﻿@using TheBrickVault.Components.Services
 @using TheBrickVault.Core.Models
+@using TheBrickVault.Infrastructure.Data
 
 
 
 @page "/"
-@* @inject LegoSetService LegoSetService*@
+
+@inject LegoDbContext DbContext
 @inject RebrickableService RebrickableService
+
 
 
 <h3>The Brick Vault</h3>
@@ -26,6 +29,7 @@ height: auto; place-content: left; padding: 10px;"/>
     <table class="table mt-3">
         <thead>
             <tr>
+                <th>Save</th>
                 <th>Set Number</th>
                 <th>Name</th>
                 <th>Number of Pieces</th>
@@ -35,6 +39,12 @@ height: auto; place-content: left; padding: 10px;"/>
             @foreach (var legoSet in legoSets)
             {
                 <tr>
+                    <td>
+                        <button @onclick="() => SaveLegoSet(legoSet)" class="btn btn-success btn-sm">
+                            <i class="bi bi-save"></i> 
+
+                        </button>
+                    </td>
                     <td>@legoSet.set_num</td>
                     <td>@legoSet.name</td>
                     <td>@legoSet.num_parts</td>
@@ -43,11 +53,45 @@ height: auto; place-content: left; padding: 10px;"/>
         </tbody>
     </table>
 }
+else if (legoSets != null && legoSets.Count == 0)
+{
+    <p>No Lego sets found.</p>
+}
 
+<h6> User's Lego Sets</h6>
+
+@if (userLegoSets != null && userLegoSets.Count > 0)
+{
+    <table class="table mt-3">
+        <thead>
+            <tr>
+                <th>Set Number</th>
+                <th>Name</th>
+                <th>Number of Pieces</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var legoSet in userLegoSets)
+            {
+                <tr>
+                    <td>@legoSet.SetNum</td>
+                    <td>@legoSet.Name</td>
+                    <td>@legoSet.PieceCount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No Lego sets saved.</p>
+}
+ 
 @code {
     private List<RebrickableLegoSet> legoSets = new List<RebrickableLegoSet>();
+    private List<LegoSet> userLegoSets = new List<LegoSet>();
     private string searchQuery;
-    
+
     private async Task SearchLegoSets()
     {
         if (!string.IsNullOrWhiteSpace(searchQuery))
@@ -58,101 +102,24 @@ height: auto; place-content: left; padding: 10px;"/>
         {
             legoSets.Clear();
         }
-}
-
-
-
-@* old design, going with something else but holding on to this in case new design is a fail.
-@if (LegoSetService == null)
-{
-<p>Loading...</p>
-}
-else if (LegoSets == null)
-{
-    <p>No Lego sets found. </p>
-}
-else
-{ 
-
-
-<table class="table">
-    <thead>
-                <tr>
-            <th scope="col">Set Number</th>
-            <th scope="col">Name</th>
-            <th scope="col">Number of Pieces</th>
-        </tr>
-    </thead>
-    <tbody>
-            @foreach (var legoSet in LegoSets)
-            {
-                <tr>
-                    <td>@legoSet.SetNum</td>
-                    <td>@legoSet.Name</td>
-                    <td>@legoSet.PieceCount</td>
-                </tr>
-            }
-    </tbody>
-</table> 
-    <h3>Lego Sets</h3>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Set Number</th>
-                <th>Name</th>
-                <th>Number of Pieces</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var set in LegoSets)
-            {
-                <tr>
-                    <td>@set.SetNum</td>
-                    <td>@set.Name</td>
-                    <td>@set.PieceCount</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-<h3>Add New Lego Set</h3>
-<EditForm Model="@newLegoSet" OnValidSubmit="@AddLegoSetAsync">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div class="form-group">
-        <label for="setNumber">Set Number:</label>
-        <InputText id="setNum" class="form-control" @bind-Value="@newLegoSet.SetNum" />
-    </div>
-    <div class="form-group">
-        <label for="name">Name:</label>
-        <InputText id="name" class="form-control" @bind-Value="@newLegoSet.Name" />
-    </div>
-    <div class="form-group">
-        <label for="numberOfPieces">Number of Pieces:</label>
-        <InputNumber id="pieceCount" class="form-control" @bind-Value="@newLegoSet.PieceCount" />
-    </div>
-    need to add some padding
-    <button type="submit" class="btn btn-primary">Add Lego Set</button>
-    </EditForm>
-
- @code {
-    
-    
-    private LegoSet newLegoSet = new LegoSet();
-    private List<LegoSet> LegoSets = new();
-
-  
-
-    protected override async Task OnInitializedAsync()
-    {
-        LegoSets = await LegoSetService.GetLegoSetsAsync();
     }
-    private async Task AddLegoSetAsync()
+
+    private async Task SaveLegoSet(RebrickableLegoSet legoSet)
     {
-        Console.WriteLine($"Adding LegoSet - Name: {newLegoSet.Name}, SetNum: {newLegoSet.SetNum}, Pieces: {newLegoSet.PieceCount}");
-        await LegoSetService.AddLegoSetAsync(newLegoSet);
-        newLegoSet = new LegoSet(); // Reset the form
-        LegoSets = await LegoSetService.GetLegoSetsAsync(); // Refresh the list
-    }*@
- }
- 
+        var newLegoSet = new LegoSet
+        {
+            SetNum = legoSet.set_num,
+            Name = legoSet.name,
+            PieceCount = legoSet.num_parts
+        };
+        await DbContext.LegoSets.AddAsync(newLegoSet);
+        await DbContext.SaveChangesAsync();
+        await LoadUserLegoSets(); 
+    }
+    
+    private async Task LoadUserLegoSets()
+    {
+        userLegoSets = await DbContext.LegoSets.ToListAsync();
+    }
+
+}
