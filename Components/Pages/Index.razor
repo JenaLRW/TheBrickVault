@@ -5,17 +5,60 @@
 
 @page "/"
 @* @inject LegoSetService LegoSetService*@
+@inject RebrickableService RebrickableService
 
 
 <h3>The Brick Vault</h3>
 <h5>Jena White's Capstone Project</h5>
 <h5>Code:You, August 2024 Cohort</h5>
 
-<img src="images/Thebrickvaultlogo.png" alt="image of a chest full of colorful bricks" style="width: 200px; height: auto; place-content: left"/>
+<img src="images/Thebrickvaultlogo.png" alt="image of a chest full of colorful bricks" style="width: 200px; 
+height: auto; place-content: left"/>
+@* insert padding here *@
 
+<h3> Search Lego Sets </h3>
 
+<InputText @bind-Value="searchQuery" placeholder="Search by Set Number or Name" class="form-control" />
+<button class="btn btn-primary" @onclick="SearchLegoSets">Search</button>
 
+@if (legoSets != null && legoSets.Count > 0)
+{
+    <table class="table mt-3">
+        <thead>
+            <tr>
+                <th>Set Number</th>
+                <th>Name</th>
+                <th>Number of Pieces</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var legoSet in legoSets)
+            {
+                <tr>
+                    <td>@legoSet.set_num</td>
+                    <td>@legoSet.name</td>
+                    <td>@legoSet.num_parts</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
+@code {
+    private List<RebrickableLegoSet> legoSets = new List<RebrickableLegoSet>();
+    private string searchQuery;
+    
+    private async Task SearchLegoSets()
+    {
+        if (!string.IsNullOrWhiteSpace(searchQuery))
+        {
+            legoSets = await RebrickableService.SearchLegoSetsAsync(searchQuery);
+        }
+        else
+        {
+            legoSets.Clear();
+        }
+}
 
 
 
@@ -29,8 +72,10 @@ else if (LegoSets == null)
     <p>No Lego sets found. </p>
 }
 else
-{ *@
-@* <table class="table">
+{ 
+
+
+<table class="table">
     <thead>
                 <tr>
             <th scope="col">Set Number</th>
@@ -108,6 +153,6 @@ else
         await LegoSetService.AddLegoSetAsync(newLegoSet);
         newLegoSet = new LegoSet(); // Reset the form
         LegoSets = await LegoSetService.GetLegoSetsAsync(); // Refresh the list
-    }
+    }*@
  }
- *@
+ 

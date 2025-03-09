@@ -36,7 +36,7 @@ namespace TheBrickVault
             builder.Services.AddDbContext<LegoDbContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            //LegoSetService API Key configuration
+            //LegoSetService API Key configuration, methods, and database access
             builder.Services.AddScoped<RebrickableService>();
 
 
@@ -57,7 +57,9 @@ namespace TheBrickVault
                 client.DefaultRequestHeaders.Add("Authorization", $"key {apiKey}");
             });
 
-            
+            //test for API key configuration.  As of March 8, 7:45pm est, it works.
+            Console.WriteLine($"RebrickableService API Key: {builder.Configuration["Rebrickable:ApiKey"]}");
+
             // Rebrickable Settings, not sure if I need this. 
             //builder.Services.AddSingleton<RebrickableSettings>(provider =>
             //{
@@ -69,11 +71,13 @@ namespace TheBrickVault
             //    return rebrickableSettings;
             //});
 
-            
+
 
 
             builder.Services.AddRazorPages();
 
+            //add services to the container - this is for User Secrets Configuration setup
+            builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
             builder.Services.AddServerSideBlazor();
 
