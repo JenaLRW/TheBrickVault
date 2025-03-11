@@ -9,7 +9,7 @@ namespace TheBrickVault.Core.Models
     //in the user's collection separate from the Rebrickable API data.
     public class LegoSet
     {
-        public int Id { get; set; } //might delete this if SetNumber is sufficient. Or use this to number/list the current sets the user has. 
+        public int Id { get; set; } //might delete this if SetNum is sufficient. Or use this to number/list the current sets the user has. 
         public string? Name { get; set; }
         //do SetNum first and only to see the Db build successfully then add the rest. 
         public string SetNum { get; set; }  //had to set it as string
@@ -20,5 +20,7 @@ namespace TheBrickVault.Core.Models
         public int? Instructions { get; set; } //might need to change type to string.
         public int? PartsList { get; set; } //not sure if type is int or string. 
 
+        public ICollection<LegoPart> Parts { get; set; } = new List<LegoPart>(); //this is a navigation property to LegoPart.
+
     }
-}
+} 

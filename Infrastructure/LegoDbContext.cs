@@ -16,12 +16,16 @@ namespace TheBrickVault.Infrastructure.Data
         }
 
         public DbSet<LegoSet> LegoSets { get; set; }
+        public DbSet<LegoPart> LegoParts { get; set; } 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<LegoSet>().HasKey(s => s.Id);
             modelBuilder.Entity<LegoSet>().Property(s => s.SetNum).IsRequired().HasMaxLength(20); 
-
+            modelBuilder.Entity<LegoPart>().HasOne(LegoPart => LegoPart.LegoSet)
+                .WithMany(LegoSet => LegoSet.Parts)
+                .HasForeignKey(LegoPart => LegoPart.SetNum)
+                .HasPrincipalKey(LegoSet => LegoSet.SetNum);
 
             //Seed data for testing
             //modelBuilder.Entity<LegoSet>().HasData(
@@ -29,7 +33,7 @@ namespace TheBrickVault.Infrastructure.Data
             //    new LegoSet { Id = 7, SetNum = "5678", Name = "Another Test Set" },
             //    new LegoSet { Id = 8, SetNum = "91011593598", Name = "Yet Another Test Set" },
             //    new LegoSet { Id = 9, SetNum = "1", Name = "" }
-        //);
+            //);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

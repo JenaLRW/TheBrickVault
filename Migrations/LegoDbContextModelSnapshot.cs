@@ -16,6 +16,26 @@ namespace TheBrickVault.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.2");
 
+            modelBuilder.Entity("TheBrickVault.Core.Models.LegoPart", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PartNum")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SetNum")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SetNum");
+
+                    b.ToTable("LegoParts");
+                });
+
             modelBuilder.Entity("TheBrickVault.Core.Models.LegoSet", b =>
                 {
                     b.Property<int>("Id")
@@ -39,12 +59,29 @@ namespace TheBrickVault.Migrations
 
                     b.Property<string>("SetNum")
                         .IsRequired()
-                        .HasMaxLength(6)
+                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.ToTable("LegoSets");
+                });
+
+            modelBuilder.Entity("TheBrickVault.Core.Models.LegoPart", b =>
+                {
+                    b.HasOne("TheBrickVault.Core.Models.LegoSet", "LegoSet")
+                        .WithMany("Parts")
+                        .HasForeignKey("SetNum")
+                        .HasPrincipalKey("SetNum")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LegoSet");
+                });
+
+            modelBuilder.Entity("TheBrickVault.Core.Models.LegoSet", b =>
+                {
+                    b.Navigation("Parts");
                 });
 #pragma warning restore 612, 618
         }
