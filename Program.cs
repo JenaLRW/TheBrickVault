@@ -19,9 +19,7 @@ namespace TheBrickVault
         // Main Method
         public static void Main(String[] args)
         {
-            Console.WriteLine("Main Method");
-
-
+            //Console.WriteLine("Main Method");
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddRazorPages();
@@ -41,16 +39,13 @@ namespace TheBrickVault
             //LegoSetService API Key configuration, methods, and database access
             builder.Services.AddScoped<RebrickableService>();
 
-
-
             // Rebrickable API
             builder.Services.AddScoped(sp =>
             new HttpClient 
             { 
                 BaseAddress = new Uri(builder.Configuration["Rebrickable:https://rebrickable.com/api/v3/"] ?? "https://localhost:5002")
             });
-            
-            
+                        
             //HttpClient 
             builder.Services.AddHttpClient("RebrickableClient", client =>
             {
@@ -60,7 +55,7 @@ namespace TheBrickVault
             });
 
             //test for API key configuration.  As of March 8, 7:45pm est, it works.
-            Console.WriteLine($"RebrickableService API Key: {builder.Configuration["Rebrickable:ApiKey"]}");
+            //Console.WriteLine($"RebrickableService API Key: {builder.Configuration["Rebrickable:ApiKey"]}");
 
             // Rebrickable Settings, not sure if I need this. 
             //builder.Services.AddSingleton<RebrickableSettings>(provider =>
@@ -72,9 +67,6 @@ namespace TheBrickVault
             //    };
             //    return rebrickableSettings;
             //});
-
-
-
 
             builder.Services.AddRazorPages();
 
@@ -107,18 +99,13 @@ namespace TheBrickVault
             app.UseRouting();
             app.UseAuthorization();
             app.UseAuthentication();
-
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
             app.MapRazorPages();
             app.MapBlazorHub();
             app.MapFallbackToPage("/_Host");
             
-
-
-
             //delete all records from the database
             using (var scope = app.Services.CreateScope())
             {
