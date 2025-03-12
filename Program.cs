@@ -15,11 +15,10 @@ namespace TheBrickVault
 
     class Program
     {
-
-        // Main Method
-        public static void Main(String[] args)
+        public static async Task Main(String[] args)
         {
-            //Console.WriteLine("Main Method");
+            Console.WriteLine("Main Method");
+
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddRazorPages();
@@ -38,6 +37,7 @@ namespace TheBrickVault
 
             //LegoSetService API Key configuration, methods, and database access
             builder.Services.AddScoped<RebrickableService>();
+            builder.Services.AddScoped<LegoPartService>();
 
             // Rebrickable API
             builder.Services.AddScoped(sp =>
@@ -57,23 +57,8 @@ namespace TheBrickVault
             //test for API key configuration.  As of March 8, 7:45pm est, it works.
             //Console.WriteLine($"RebrickableService API Key: {builder.Configuration["Rebrickable:ApiKey"]}");
 
-            // Rebrickable Settings, not sure if I need this. 
-            //builder.Services.AddSingleton<RebrickableSettings>(provider =>
-            //{
-            //    string apiKey = builder.Configuration.GetValue<string>("Rebrickable:ApiKey");
-            //    var rebrickableSettings = new RebrickableSettings
-            //    {
-            //        ApiKey = apiKey
-            //    };
-            //    return rebrickableSettings;
-            //});
-
-            builder.Services.AddRazorPages();
-
             //add services to the container - this is for User Secrets Configuration setup
             builder.Services.AddRazorComponents().AddInteractiveServerComponents();
-
-            builder.Services.AddServerSideBlazor();
 
             var app = builder.Build();
 
@@ -82,12 +67,11 @@ namespace TheBrickVault
             //    var dbContext = scope.ServiceProvider.GetRequiredService<LegoDbContext>();
             //    DbInitializer.Initialize(dbContext);
             //}
-
+            
             //HTTP request pipeline
             if (app.Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-
             }
             else
             {
@@ -95,17 +79,16 @@ namespace TheBrickVault
                 app.UseHsts();
             }
             
-            app.UseStaticFiles();
-            app.UseRouting();
             app.UseAuthorization();
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
+
             app.MapRazorPages();
             app.MapBlazorHub();
             app.MapFallbackToPage("/_Host");
-            
+
             //delete all records from the database
             using (var scope = app.Services.CreateScope())
             {

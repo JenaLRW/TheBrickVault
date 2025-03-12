@@ -81,36 +81,4 @@ namespace TheBrickVault.Components.Services
         public List<RebrickableLegoSet> Results { get; set; } = new();
     }
 
-
-
-
-
-    // old design.  trying a new design and keeping old design in case the new is a fail.
-
-    //public class RebrickableService
-    //{
-    //    private readonly IHttpClientFactory _clientFactory;
-    //    private readonly RebrickableSettings _rebrickableSettings;
-
-    //    public RebrickableService(IHttpClientFactory clientFactory, RebrickableSettings rebrickableSettings)
-    //    {
-    //        _clientFactory = clientFactory;
-    //        _rebrickableSettings = rebrickableSettings;
-    //    }
-    //    public async Task<LegoSet> GetSetDetailsAsync(int setNum)
-    //    {
-    //        var client = _clientFactory.CreateClient("RebrickableClient");
-    //        var response = await client.GetAsync($"lego/sets/{setNum}/");
-
-    //        if (response.IsSuccessStatusCode)
-    //        {
-
-    //            var content = await response.Content.ReadAsStringAsync();
-    //            return JsonConvert.DeserializeObject<LegoSet>(content);
-
-    //        }
-    //        return null;
-    //    }
-
-    //}
 }
