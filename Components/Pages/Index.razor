@@ -2,24 +2,20 @@
 @using TheBrickVault.Core.Models
 @using TheBrickVault.Infrastructure.Data
 
-
-
 @page "/"
 
 @inject LegoDbContext DbContext
 @inject RebrickableService RebrickableService
 
-
-
 <h3>The Brick Vault</h3>
-<h5>Jena White's Capstone Project</h5>
-<h5>Code:You, August 2024 Cohort</h5>
+<h6>Jena White's Capstone Project</h6>
+<h6>Code:You, August 2024 Cohort</h6>
 
 <img src="images/Thebrickvaultlogo.png" alt="image of a chest full of colorful bricks" style="width: 200px; 
 height: auto; place-content: left; padding: 10px;"/>
 
 
-<h6> Search Lego Sets </h6>
+<h4> Search Lego Sets </h4>
 
 <InputText @bind-Value="searchQuery" placeholder="Search by Set Number or Name" class="form-control" />
 <button class="btn btn-primary" @onclick="SearchLegoSets" style="margin: 10px;">Search</button>
@@ -53,12 +49,13 @@ height: auto; place-content: left; padding: 10px;"/>
         </tbody>
     </table>
 }
-else if (legoSets != null && legoSets.Count == 0)
+
+else if (searchPerformed && legoSets.Count == 0)
 {
     <p>No Lego sets found.</p>
 }
 
-<h6> User's Lego Sets</h6>
+<h4> User's Lego Sets</h4>
 
 @if (userLegoSets != null && userLegoSets.Count > 0)
 {
@@ -86,14 +83,17 @@ else
 {
     <p>No Lego sets saved.</p>
 }
- 
+<button class="btn btn-danger" @onclick="ClearSavedLegoSets" style="margin: 10px;">Clear Saved Lego Sets</button>
+
 @code {
     private List<RebrickableLegoSet> legoSets = new List<RebrickableLegoSet>();
     private List<LegoSet> userLegoSets = new List<LegoSet>();
     private string searchQuery;
+    private bool searchPerformed = false;
 
     private async Task SearchLegoSets()
     {
+        searchPerformed = true;
         if (!string.IsNullOrWhiteSpace(searchQuery))
         {
             legoSets = await RebrickableService.SearchLegoSetsAsync(searchQuery);
@@ -121,5 +121,10 @@ else
     {
         userLegoSets = await DbContext.LegoSets.ToListAsync();
     }
-
+    private async Task ClearSavedLegoSets()
+    {
+        DbContext.LegoSets.RemoveRange(DbContext.LegoSets);
+        await DbContext.SaveChangesAsync();
+        await LoadUserLegoSets();
+    }
 }

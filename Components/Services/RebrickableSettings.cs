@@ -8,12 +8,7 @@
             ApiKey = string.Empty;
         }
 
-        //public string GetApiKey()
-        //{
-
-        //    return ApiKey;
-        //}
-
+        
 
 
         //Intellisense suggested the block below. I don't know if I need it or not.  Will keep for now.
