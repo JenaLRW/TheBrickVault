@@ -32,18 +32,18 @@ height: auto; place-content: left; padding: 10px;"/>
             </tr>
         </thead>
         <tbody>
-            @foreach (var setsWIthParts in setsWithParts)
+            @foreach (var setWithParts in setsWithParts)
             {
                 <tr>
                     <td>
-                        <button @onclick="() => SaveLegoSet(setsWithParts.Set)" class="btn btn-success btn-sm">
+                        <button @onclick="() => SaveLegoSet(setWithParts.Set)" class="btn btn-success btn-sm">
                             <i class="bi bi-save"></i> 
 
                         </button>
                     </td>
-                    <td>@setsWithParts.Set.set_num</td>
-                    <td>@setsWithParts.Set.name</td>
-                    <td>@setsWithParts.Set.num_parts</td>
+                    <td>@setWithParts.Set.set_num</td>
+                    <td>@setWithParts.Set.name</td>
+                    <td>@setWithParts.Set.num_parts</td>
                 </tr>
             }
         </tbody>
