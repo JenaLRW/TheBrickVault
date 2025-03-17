@@ -17,28 +17,28 @@ namespace TheBrickVault.Components.Services
     //{
     //    private readonly LegoDbContext _context = context;
 
-    //    public async Task<LegoSet> GetLegoSetByIdAsync(int id)
+    //    public async Task<DbLegoSet> GetLegoSetByIdAsync(int id)
     //    {
-    //        return await _context.LegoSets.FindAsync(id);
+    //        return await _context.DbLegoSets.FindAsync(id);
     //    }
 
-    //    public async Task<List<LegoSet>> GetLegoSetsAsync()
+    //    public async Task<List<DbLegoSet>> GetLegoSetsAsync()
     //    {
-    //        return await _context.LegoSets.ToListAsync();
+    //        return await _context.DbLegoSets.ToListAsync();
     //    }
 
-    //    public async Task<IEnumerable<LegoSet>> GetAllLegoSetsAsync()
+    //    public async Task<IEnumerable<DbLegoSet>> GetAllLegoSetsAsync()
     //    {
-    //        return await _context.LegoSets.ToListAsync();
+    //        return await _context.DbLegoSets.ToListAsync();
     //    }
-    //    public async Task AddLegoSetAsync(LegoSet legoSet)
+    //    public async Task AddLegoSetAsync(DbLegoSet legoSet)
     //    {
-    //        _context.LegoSets.Add(legoSet);
+    //        _context.DbLegoSets.Add(legoSet);
     //        await _context.SaveChangesAsync();
     //    }
-    //    public async Task UpdateLegoSetAsync(LegoSet legoSet)
+    //    public async Task UpdateLegoSetAsync(DbLegoSet legoSet)
     //    {
-    //        _context.LegoSets.Update(legoSet);
+    //        _context.DbLegoSets.Update(legoSet);
     //        await _context.SaveChangesAsync();
     //    }
     //    public async Task DeleteLegoSetAsync(int id)
@@ -46,7 +46,7 @@ namespace TheBrickVault.Components.Services
     //        var legoSet = await GetLegoSetByIdAsync(id);
     //        if (legoSet != null)
     //        {
-    //            _context.LegoSets.Remove(legoSet);
+    //            _context.DbLegoSets.Remove(legoSet);
     //            await _context.SaveChangesAsync();
     //        }
     //    }

@@ -7,7 +7,7 @@ namespace TheBrickVault.Core.Models
 
     //this is a model that represents a lego set stored in the app's db. This is used to store and manage Lego sets 
     //in the user's collection separate from the Rebrickable API data.
-    public class LegoSet
+    public class DbLegoSet
     {
         public int Id { get; set; } //might delete this if SetNum is sufficient. Or use this to number/list the current sets the user has. 
         public string? Name { get; set; }
@@ -20,7 +20,7 @@ namespace TheBrickVault.Core.Models
         public int? Instructions { get; set; } //might need to change type to string.
         public int? PartsList { get; set; } //not sure if type is int or string. 
 
-        public ICollection<LegoPart> Parts { get; set; } = new List<LegoPart>(); //this is a navigation property to LegoPart.
+        public ICollection<DbLegoPart> Parts { get; set; } = new List<DbLegoPart>(); //this is a navigation property to DbLegoPart.
 
     }
 } 
