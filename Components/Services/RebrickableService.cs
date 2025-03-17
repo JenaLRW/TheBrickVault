@@ -17,7 +17,7 @@ namespace TheBrickVault.Components.Services
     //RebrickableService is to handle fetching data from the Rebrickable API and processing it into a 
     //format that can be used by the application.
     //
-    //Use the HttpClient to connect to Rebrickable's API endpoints and search for Lego sets.
+    //Use the HttpClient to connect to Rebrickable's API endpoints and search for Lego sets and their parts.
     //
     //The RebrickableService will be responsible for making the API calls, handling the responses, and 
     //converting the data into a format that can be used by the application.
@@ -37,48 +37,59 @@ namespace TheBrickVault.Components.Services
         }
         
 
-        //use HttpClient to connect to Rebrickable's API endpoints and search for Lego sets.
-        public async Task<string> GetLegoSetAsync(string searchQuery)
+        //use HttpClient to connect to Rebrickable's API endpoints and search for Lego sets and their parts in a single method.
+        public async Task<List<RebrickableLegoSetWithParts>> FetchSetsAndPartsAsync(string searchQuery)
         {
-            var client = _clientFactory.CreateClient("RebrickableClient");
-            var response = await client.GetAsync($"lego/sets/?search={searchQuery}");
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                return content;
-            }
-            return "Error retrieving data.";
+            var sets = await SearchLegoSetsAsync(searchQuery);
+            var setsWithParts = new List<RebrickableLegoSetWithParts>();
 
+            foreach (var set in sets)
+            {
+                var parts = await FetchPartsForSetsAsync(set.set_num);
+                setsWithParts.Add(new RebrickableLegoSetWithParts
+                {
+                    Set = set,
+                    Parts = parts
+                });
+            }
+            return setsWithParts;
         }
 
-        public async Task<List<RebrickableLegoSet>> SearchLegoSetsAsync(string searchQuery)
+        //use HttpClient to connect to Rebrickable's API endpoints and search for Lego sets.
+        private async Task<List<RebrickableLegoSet>> SearchLegoSetsAsync(string searchQuery)
         {
             if (string.IsNullOrWhiteSpace(searchQuery))
             {
                 return new List<RebrickableLegoSet>();
             }
 
-                var url = $"{BaseUrl}?search={searchQuery}&key={_apiKey}";
-
-                var response =  await _clientFactory.CreateClient().GetFromJsonAsync<RebrickableSearchResult>(url);
-                return response?.Results ?? new List<RebrickableLegoSet>();
-            
-
-            //var client = _clientFactory.CreateClient("RebrickableClient");
-            //var response = await client.GetAsync($"lego/sets/?search={searchQuery}");
-            //if (response.IsSuccessStatusCode)
-            //{
-            //    var content = await response.Content.ReadAsStringAsync();
-            //    var legoSets = JsonConvert.DeserializeObject<RebrickableLegoSet>(content);
-            //    return legoSets;
-            //}
-            //return null;
+            var url = $"{BaseUrl}?search={searchQuery}&key={_apiKey}";
+            var response = await _clientFactory.CreateClient().GetFromJsonAsync<RebrickableSearchResult>(url);
+            return response?.Results ?? new List<RebrickableLegoSet>();
         }
 
+
+        //fetch parts for a specific set from Rebrickable's API.
+        public async Task<List<RebrickableLegoPart>> FetchPartsForSetsAsync(string setNum)
+        {
+            var url = $"{BaseUrl}{setNum}/parts/?key={_apiKey}";
+            var response = await _clientFactory.CreateClient().GetFromJsonAsync<RebrickablePartsResult>(url);
+            return response?.Results ?? new List<RebrickableLegoPart>();
+        }
     }
     public class RebrickableSearchResult
     {
         public List<RebrickableLegoSet> Results { get; set; } = new();
+    }
+    public class RebrickablePartsResult
+    {
+        public List<RebrickableLegoPart> Results { get; set; } = new();
+    }
+
+    public class RebrickableLegoSetWithParts
+    {
+        public RebrickableLegoSet Set { get; set; }
+        public List<RebrickableLegoPart> Parts { get; set; }
     }
 
 }
