@@ -17,7 +17,7 @@ namespace TheBrickVault
     {
         public static async Task Main(String[] args)
         {
-            Console.WriteLine("Main Method");
+            //Console.WriteLine("Main Method");
 
             var builder = WebApplication.CreateBuilder(args);
 
@@ -37,7 +37,8 @@ namespace TheBrickVault
 
             //LegoSetService API Key configuration, methods, and database access
             builder.Services.AddScoped<RebrickableService>();
-            builder.Services.AddScoped<LegoPartService>();
+            //builder.Services.AddScoped<LegoPartService>(); ----changing this method to combine sets with parts endpoints into one method
+            //inside RebrickbleService.cs file. 
 
             // Rebrickable API
             builder.Services.AddScoped(sp =>

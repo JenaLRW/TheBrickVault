@@ -20,7 +20,7 @@ height: auto; place-content: left; padding: 10px;"/>
 <InputText @bind-Value="searchQuery" placeholder="Search by Set Number or Name" class="form-control" />
 <button class="btn btn-primary" @onclick="SearchLegoSets" style="margin: 10px;">Search</button>
 
-@if (legoSets != null && legoSets.Count > 0)
+@if (setsWithParts != null && setsWithParts.Count > 0)//probably need to rename legoSets to the new method, please display sets only. 
 {
     <table class="table mt-3">
         <thead>
@@ -32,25 +32,25 @@ height: auto; place-content: left; padding: 10px;"/>
             </tr>
         </thead>
         <tbody>
-            @foreach (var legoSet in legoSets)
+            @foreach (var setsWIthParts in setsWithParts)
             {
                 <tr>
                     <td>
-                        <button @onclick="() => SaveLegoSet(legoSet)" class="btn btn-success btn-sm">
+                        <button @onclick="() => SaveLegoSet(setsWithParts.Set)" class="btn btn-success btn-sm">
                             <i class="bi bi-save"></i> 
 
                         </button>
                     </td>
-                    <td>@legoSet.set_num</td>
-                    <td>@legoSet.name</td>
-                    <td>@legoSet.num_parts</td>
+                    <td>@setsWithParts.Set.set_num</td>
+                    <td>@setsWithParts.Set.name</td>
+                    <td>@setsWithParts.Set.num_parts</td>
                 </tr>
             }
         </tbody>
     </table>
 }
 
-else if (searchPerformed && legoSets.Count == 0)
+else if (searchPerformed && setsWithParts.Count == 0)
 {
     <p>No Lego sets found.</p>
 }
@@ -67,6 +67,7 @@ else if (searchPerformed && legoSets.Count == 0)
                 <th>Number of Pieces</th>
             </tr>
         </thead>
+
         <tbody>
             @foreach (var legoSet in userLegoSets)
             {
@@ -86,7 +87,7 @@ else
 <button class="btn btn-danger" @onclick="ClearSavedLegoSets" style="margin: 10px;">Clear Saved Lego Sets</button>
 
 @code {
-    private List<RebrickableLegoSet> legoSets = new List<RebrickableLegoSet>();
+    private List<RebrickableLegoSetWithParts> setsWithParts = new List<RebrickableLegoSetWithParts>();
     private List<LegoSet> userLegoSets = new List<LegoSet>();
     private string searchQuery;
     private bool searchPerformed = false;
@@ -96,11 +97,11 @@ else
         searchPerformed = true;
         if (!string.IsNullOrWhiteSpace(searchQuery))
         {
-            legoSets = await RebrickableService.SearchLegoSetsAsync(searchQuery);
+            setsWithParts = await RebrickableService.FetchSetsAndPartsAsync(searchQuery);
         }
         else
         {
-            legoSets.Clear();
+            setsWithParts.Clear();
         }
     }
 
