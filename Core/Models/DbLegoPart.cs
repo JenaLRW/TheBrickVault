@@ -2,7 +2,7 @@
 
 namespace TheBrickVault.Core.Models
 {
-    public class LegoPart
+    public class DbLegoPart
     {
         public int Id { get; set; }
         [ForeignKey("SetNum")]
@@ -11,8 +11,9 @@ namespace TheBrickVault.Core.Models
 
         //public string PartImageUrl { get; set; } maybe explore this later if time permits.
 
-        
-        public LegoSet LegoSet { get; set; } //Navigation property to SetNum
-        
-        
+
+        public DbLegoSet LegoSet { get; set; } //Navigation property to SetNum
+
+
+    }
 }

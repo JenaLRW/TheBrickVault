@@ -94,7 +94,7 @@ namespace TheBrickVault
             using (var scope = app.Services.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<LegoDbContext>();
-                dbContext.LegoSets.RemoveRange(dbContext.LegoSets);
+                dbContext.DbLegoSets.RemoveRange(dbContext.DbLegoSets);
                 dbContext.SaveChanges();
             }
 

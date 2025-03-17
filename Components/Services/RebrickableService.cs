@@ -89,7 +89,8 @@ namespace TheBrickVault.Components.Services
     public class RebrickableLegoSetWithParts
     {
         public RebrickableLegoSet Set { get; set; }
-        public List<RebrickableLegoPart> Parts { get; set; }
+        public List<RebrickableLegoSet> Parts { get; set; }
+        
     }
 
 }

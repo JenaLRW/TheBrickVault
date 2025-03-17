@@ -20,31 +20,31 @@ namespace TheBrickVault.Components.Services
     //    }
 
     //    //fetching saved sets from user's input
-    //    public async Task<List<LegoSet>> GetSavedLegoSetsAsync()
+    //    public async Task<List<DbLegoSet>> GetSavedLegoSetsAsync()
     //    {
-    //        return await _dbContext.LegoSets.ToListAsync();
+    //        return await _dbContext.DbLegoSets.ToListAsync();
     //    }
 
     //    //fetching parts for the saved sets
-    //    public async Task<List<LegoPart>> GetPartsForSetAsync(string setNum)
+    //    public async Task<List<DbLegoPart>> GetPartsForSetAsync(string setNum)
     //    {
-    //        return await _dbContext.LegoParts
+    //        return await _dbContext.DbLegoParts
     //            .Where(p => p.SetNum == setNum)
     //            .ToListAsync();
     //    }
 
     //    //fetching parts for a set from Rebrickable's API
-    //    public async Task<List<LegoPart>> SearchPartsForSetAsync(string setNum)
+    //    public async Task<List<DbLegoPart>> SearchPartsForSetAsync(string setNum)
     //    {
     //        if (string.IsNullOrWhiteSpace(setNum))
     //        {
-    //            return new List<LegoPart>();
+    //            return new List<DbLegoPart>();
     //        }
 
     //        var ul = $"{BaseUrl}{setNum}/parts/?key={_apiKey}";
 
     //        var response = await _clientFactory.CreateClient().GetFromJsonAsync<RebrickablePartResult>(ul);
-    //        return response?.Results ?? new List<LegoPart>();
+    //        return response?.Results ?? new List<DbLegoPart>();
     //    }
 
     //        //testing the fetch, printing out a list of parts
@@ -60,7 +60,7 @@ namespace TheBrickVault.Components.Services
 
     //    public class RebrickablePartResult
     //    {
-    //        public List<LegoPart> Results { get; set; }
+    //        public List<DbLegoPart> Results { get; set; }
     //    }
        
     //}

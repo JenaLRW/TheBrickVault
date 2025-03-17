@@ -12,17 +12,17 @@ namespace TheBrickVault.Infrastructure.Data
     {
         public LegoDbContext(DbContextOptions<LegoDbContext> options) : base(options) 
         {
-            LegoSets = Set<LegoSet>();
+            DbLegoSets = Set<DbLegoSet>();
         }
 
-        public DbSet<LegoSet> LegoSets { get; set; }
-        public DbSet<LegoPart> LegoParts { get; set; }
+        public DbSet<DbLegoSet> DbLegoSets { get; set; }
+        public DbSet<DbLegoPart> DbLegoParts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<LegoSet>().HasKey(s => s.Id);
-            modelBuilder.Entity<LegoSet>().Property(s => s.SetNum).IsRequired().HasMaxLength(20);
-            modelBuilder.Entity<LegoPart>().HasOne(LegoPart => LegoPart.LegoSet)
+            modelBuilder.Entity<DbLegoSet>().HasKey(s => s.Id);
+            modelBuilder.Entity<DbLegoSet>().Property(s => s.SetNum).IsRequired().HasMaxLength(20);
+            modelBuilder.Entity<DbLegoPart>().HasOne(LegoPart => LegoPart.LegoSet)
                 .WithMany(LegoSet => LegoSet.Parts)
                 .HasForeignKey(LegoPart => LegoPart.SetNum)
                 .HasPrincipalKey(LegoSet => LegoSet.SetNum);

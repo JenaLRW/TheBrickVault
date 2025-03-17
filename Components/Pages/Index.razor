@@ -20,7 +20,7 @@ height: auto; place-content: left; padding: 10px;"/>
 <InputText @bind-Value="searchQuery" placeholder="Search by Set Number or Name" class="form-control" />
 <button class="btn btn-primary" @onclick="SearchLegoSets" style="margin: 10px;">Search</button>
 
-@if (setsWithParts != null && setsWithParts.Count > 0)//probably need to rename legoSets to the new method, please display sets only. 
+@if (setsWithParts != null && setsWithParts.Count > 0)
 {
     <table class="table mt-3">
         <thead>
@@ -88,7 +88,7 @@ else
 
 @code {
     private List<RebrickableLegoSetWithParts> setsWithParts = new List<RebrickableLegoSetWithParts>();
-    private List<LegoSet> userLegoSets = new List<LegoSet>();
+    private List<DbLegoSet> userLegoSets = new List<DbLegoSet>();
     private string searchQuery;
     private bool searchPerformed = false;
 
@@ -107,24 +107,24 @@ else
 
     private async Task SaveLegoSet(RebrickableLegoSet legoSet)
     {
-        var newLegoSet = new LegoSet
+        var newLegoSet = new DbLegoSet
         {
             SetNum = legoSet.set_num,
             Name = legoSet.name,
             PieceCount = legoSet.num_parts
         };
-        await DbContext.LegoSets.AddAsync(newLegoSet);
+        await DbContext.DbLegoSets.AddAsync(newLegoSet);
         await DbContext.SaveChangesAsync();
         await LoadUserLegoSets(); 
     }
     
     private async Task LoadUserLegoSets()
     {
-        userLegoSets = await DbContext.LegoSets.ToListAsync();
+        userLegoSets = await DbContext.DbLegoSets.ToListAsync();
     }
     private async Task ClearSavedLegoSets()
     {
-        DbContext.LegoSets.RemoveRange(DbContext.LegoSets);
+        DbContext.DbLegoSets.RemoveRange(DbContext.DbLegoSets);
         await DbContext.SaveChangesAsync();
         await LoadUserLegoSets();
     }
