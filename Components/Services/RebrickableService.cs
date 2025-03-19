@@ -3,9 +3,9 @@ using Newtonsoft.Json;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using TheBrickVault.Core.Models;
 using Microsoft.Extensions.Configuration;
 using System.Security.Cryptography.X509Certificates;
+using TheBrickVault.Core.DTO;
 
 
 
