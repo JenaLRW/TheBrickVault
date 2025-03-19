@@ -1,4 +1,4 @@
-﻿namespace TheBrickVault.Core.Models
+﻿namespace TheBrickVault.Core.DTO
 {
     //This is a model that represents a Lego set retrived from the Rebrickable.com API.  This helps structure data
     //when searching for Lego sets through Rebrickable and storing relevant information in the db.
