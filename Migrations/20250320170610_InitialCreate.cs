@@ -26,27 +26,33 @@ namespace TheBrickVault.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DbLegoSets", x => x.Id);
-                    table.UniqueConstraint("AK_DbLegoSets_SetNum", x => x.SetNum);
                 });
 
             migrationBuilder.CreateTable(
                 name: "DbLegoParts",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
                     SetNum = table.Column<string>(type: "TEXT", nullable: false),
                     PartNum = table.Column<string>(type: "TEXT", nullable: true),
-                    Quantity = table.Column<int>(type: "INTEGER", nullable: true)
+                    Quantity = table.Column<int>(type: "INTEGER", nullable: true),
+                    DbLegoSetId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DbLegoParts", x => x.SetNum);
+                    table.PrimaryKey("PK_DbLegoParts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DbLegoParts_DbLegoSets_SetNum",
-                        column: x => x.SetNum,
+                        name: "FK_DbLegoParts_DbLegoSets_DbLegoSetId",
+                        column: x => x.DbLegoSetId,
                         principalTable: "DbLegoSets",
-                        principalColumn: "SetNum",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DbLegoParts_DbLegoSetId",
+                table: "DbLegoParts",
+                column: "DbLegoSetId");
         }
 
         /// <inheritdoc />
