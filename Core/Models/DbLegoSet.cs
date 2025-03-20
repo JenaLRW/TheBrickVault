@@ -11,7 +11,7 @@ namespace TheBrickVault.Core.Models
     {
         public int Id { get; set; } //Primary key
         public string? Name { get; set; }
-        public string SetNum { get; set; }  //unique identifier for the Lego set.  This is also a foreign key to DbLegoPart.
+        public string SetNum { get; set; }  //unique identifier for the Lego set.  
         public string? Images { get; set; }  //NOT IMPORTANT RIGHT NOW
         public int? PieceCount { get; set; }
         public int? Instructions { get; set; } //might need to change type to string.

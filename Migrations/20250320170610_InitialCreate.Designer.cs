@@ -10,7 +10,7 @@ using TheBrickVault.Infrastructure.Data;
 namespace TheBrickVault.Migrations
 {
     [DbContext(typeof(LegoDbContext))]
-    [Migration("20250320142309_InitialCreate")]
+    [Migration("20250320170610_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -21,8 +21,12 @@ namespace TheBrickVault.Migrations
 
             modelBuilder.Entity("TheBrickVault.Core.Models.DbLegoPart", b =>
                 {
-                    b.Property<string>("SetNum")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("DbLegoSetId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("PartNum")
                         .HasColumnType("TEXT");
@@ -30,7 +34,13 @@ namespace TheBrickVault.Migrations
                     b.Property<int?>("Quantity")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("SetNum");
+                    b.Property<string>("SetNum")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DbLegoSetId");
 
                     b.ToTable("DbLegoParts");
                 });
@@ -68,14 +78,9 @@ namespace TheBrickVault.Migrations
 
             modelBuilder.Entity("TheBrickVault.Core.Models.DbLegoPart", b =>
                 {
-                    b.HasOne("TheBrickVault.Core.Models.DbLegoSet", "LegoSet")
+                    b.HasOne("TheBrickVault.Core.Models.DbLegoSet", null)
                         .WithMany("ListOfParts")
-                        .HasForeignKey("SetNum")
-                        .HasPrincipalKey("SetNum")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("LegoSet");
+                        .HasForeignKey("DbLegoSetId");
                 });
 
             modelBuilder.Entity("TheBrickVault.Core.Models.DbLegoSet", b =>
