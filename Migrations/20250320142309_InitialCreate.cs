@@ -35,7 +35,7 @@ namespace TheBrickVault.Migrations
                 {
                     SetNum = table.Column<string>(type: "TEXT", nullable: false),
                     PartNum = table.Column<string>(type: "TEXT", nullable: true),
-                    Quantity = table.Column<string>(type: "TEXT", nullable: true)
+                    Quantity = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {

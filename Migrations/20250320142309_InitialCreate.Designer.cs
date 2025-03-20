@@ -10,7 +10,7 @@ using TheBrickVault.Infrastructure.Data;
 namespace TheBrickVault.Migrations
 {
     [DbContext(typeof(LegoDbContext))]
-    [Migration("20250319180856_InitialCreate")]
+    [Migration("20250320142309_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -27,8 +27,8 @@ namespace TheBrickVault.Migrations
                     b.Property<string>("PartNum")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Quantity")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("Quantity")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("SetNum");
 

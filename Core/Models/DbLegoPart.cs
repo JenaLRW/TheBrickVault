@@ -11,7 +11,7 @@ namespace TheBrickVault.Core.Models
         [Key]
         public string SetNum { get; set; } //Primary key and foreign key to DbLegoSet
         public string? PartNum { get; set; }
-        public string? Name { get; set; }
+        //public string? Name { get; set; }
         public int? Quantity { get; set; }
 
         [ForeignKey("SetNum")]

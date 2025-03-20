@@ -24,8 +24,8 @@ namespace TheBrickVault.Migrations
                     b.Property<string>("PartNum")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Quantity")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("Quantity")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("SetNum");
 
