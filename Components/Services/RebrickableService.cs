@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using System.Security.Cryptography.X509Certificates;
 using TheBrickVault.Core.DTO;
+using TheBrickVault.Core.Models;
+using TheBrickVault.Infrastructure.Data;
 
 
 
@@ -25,19 +27,28 @@ namespace TheBrickVault.Components.Services
     {
         private readonly IHttpClientFactory _clientFactory;
         private readonly string _apiKey;
+        private readonly LegoDbContext _dbContext;
         private const string BaseUrl = "https://rebrickable.com/api/v3/lego/sets/";
 
-        public RebrickableService(IHttpClientFactory clientFactory, IConfiguration configuration)
+
+        //Initializes the RebrickableService with an IHttpClientFactory and an IConfiguration object.
+        public RebrickableService(IHttpClientFactory clientFactory, IConfiguration configuration, LegoDbContext dbContext)
         {
 
             _clientFactory = clientFactory;
             //this is to get the API key from UserSecrets
             _apiKey = configuration["Rebrickable:ApiKey"];
-            
+            _dbContext = dbContext;
+
         }
-        
+
 
         //use HttpClient to connect to Rebrickable's API endpoints and search for Lego sets and their parts in a single method.
+        //AI explanation: functionality -
+        // 1. calls SearchLegoSetsAsycn to fetch a list of Lego sets matching the search query.
+        // 2. Iterates over each set and calls FetchPartsForSetsAsync to fetch the parts for each set.
+        // 3. Combines each set with its parts into a RebrickableLegoSetWithParts object.
+        // 4. Returns a list of RebrickableLegoSetWithParts objects.
         public async Task<List<RebrickableLegoSetWithParts>> FetchSetsAndPartsAsync(string searchQuery)
         {
             var sets = await SearchLegoSetsAsync(searchQuery);
@@ -74,23 +85,40 @@ namespace TheBrickVault.Components.Services
         {
             var url = $"{BaseUrl}{setNum}/parts/?key={_apiKey}";
             var response = await _clientFactory.CreateClient().GetFromJsonAsync<RebrickablePartsResult>(url);
-            return response?.Results ?? new List<RebrickableLegoPart>();
+            var parts = response?.Results ?? new List<RebrickableLegoPart>();
+
+            foreach (var part in parts)
+            {
+                DbLegoPart newLegoParts = new DbLegoPart
+                {
+                    SetNum = setNum,
+                    PartNum = part.num_parts,
+                    Name = part.name,
+                    Quantity = part.quantity
+                };
+                await _dbContext.DbLegoParts.AddAsync(newLegoParts);
+            }
+            await _dbContext.SaveChangesAsync();
+            return parts;
+                
+                       
         }
-    }
-    public class RebrickableSearchResult
-    {
-        public List<RebrickableLegoSet> Results { get; set; } = new();
-    }
-    public class RebrickablePartsResult
-    {
-        public List<RebrickableLegoPart> Results { get; set; } = new();
-    }
+        public class RebrickableSearchResult
+        {
+            public List<RebrickableLegoSet> Results { get; set; } = new();
+        }
+        public class RebrickablePartsResult
+        {
+            public List<RebrickableLegoPart> Results { get; set; } = new();
+        }
 
-    public class RebrickableLegoSetWithParts
-    {
-        public RebrickableLegoSet Set { get; set; }
-        public List<RebrickableLegoPart> Parts { get; set; }
-        
-    }
+        public class RebrickableLegoSetWithParts
+        {
+            public RebrickableLegoSet Set { get; set; }
+            public List<RebrickableLegoPart> Parts { get; set; } = new List<RebrickableLegoPart>();
+            // Initialize the list to avoid null reference exceptions
 
+        }
+
+    }
 }

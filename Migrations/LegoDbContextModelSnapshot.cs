@@ -18,20 +18,16 @@ namespace TheBrickVault.Migrations
 
             modelBuilder.Entity("TheBrickVault.Core.Models.DbLegoPart", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("SetNum")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("PartNum")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("SetNum")
-                        .IsRequired()
+                    b.Property<string>("Quantity")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("SetNum");
+                    b.HasKey("SetNum");
 
                     b.ToTable("DbLegoParts");
                 });

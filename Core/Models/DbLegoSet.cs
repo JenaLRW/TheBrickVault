@@ -9,17 +9,13 @@ namespace TheBrickVault.Core.Models
     //in the user's collection separate from the Rebrickable API data.
     public class DbLegoSet
     {
-        public int Id { get; set; } //might delete this if SetNum is sufficient. Or use this to number/list the current sets the user has. 
+        public int Id { get; set; } //Primary key
         public string? Name { get; set; }
-        //do SetNum first and only to see the Db build successfully then add the rest. 
-        public string SetNum { get; set; }  //had to set it as string
-
+        public string SetNum { get; set; }  //unique identifier for the Lego set.  This is also a foreign key to DbLegoPart.
         public string? Images { get; set; }  //NOT IMPORTANT RIGHT NOW
         public int? PieceCount { get; set; }
-
         public int? Instructions { get; set; } //might need to change type to string.
         public int? PartsList { get; set; } //not sure if type is int or string. 
-
         public ICollection<DbLegoPart> Parts { get; set; } = new List<DbLegoPart>(); //this is a navigation property to DbLegoPart.
 
     }
