@@ -16,7 +16,7 @@ namespace TheBrickVault.Core.Models
         public int? PieceCount { get; set; }
         public int? Instructions { get; set; } //might need to change type to string.
         public int? PartsList { get; set; } //not sure if type is int or string. 
-        public ICollection<DbLegoPart> Parts { get; set; } = new List<DbLegoPart>(); //this is a navigation property to DbLegoPart.
+        public ICollection<DbLegoPart> ListOfParts { get; set; } = new List<DbLegoPart>(); //this is a navigation property to DbLegoPart.
 
     }
 } 

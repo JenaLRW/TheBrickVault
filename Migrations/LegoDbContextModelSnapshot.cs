@@ -66,7 +66,7 @@ namespace TheBrickVault.Migrations
             modelBuilder.Entity("TheBrickVault.Core.Models.DbLegoPart", b =>
                 {
                     b.HasOne("TheBrickVault.Core.Models.DbLegoSet", "LegoSet")
-                        .WithMany("Parts")
+                        .WithMany("ListOfParts")
                         .HasForeignKey("SetNum")
                         .HasPrincipalKey("SetNum")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -77,7 +77,7 @@ namespace TheBrickVault.Migrations
 
             modelBuilder.Entity("TheBrickVault.Core.Models.DbLegoSet", b =>
                 {
-                    b.Navigation("Parts");
+                    b.Navigation("ListOfParts");
                 });
 #pragma warning restore 612, 618
         }

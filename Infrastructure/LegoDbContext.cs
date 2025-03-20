@@ -24,7 +24,7 @@ namespace TheBrickVault.Infrastructure.Data
             modelBuilder.Entity<DbLegoSet>().HasKey(s => s.Id);
             modelBuilder.Entity<DbLegoSet>().Property(s => s.SetNum).IsRequired().HasMaxLength(20);
             modelBuilder.Entity<DbLegoPart>().HasOne(LegoPart => LegoPart.LegoSet)
-                .WithMany(LegoSet => LegoSet.Parts)
+                .WithMany(LegoSet => LegoSet.ListOfParts)
                 .HasForeignKey(LegoPart => LegoPart.SetNum)
                 .HasPrincipalKey(LegoSet => LegoSet.SetNum);
         }
