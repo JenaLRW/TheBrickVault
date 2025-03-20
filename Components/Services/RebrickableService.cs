@@ -92,7 +92,7 @@ namespace TheBrickVault.Components.Services
                 DbLegoPart newLegoParts = new DbLegoPart
                 {
                     SetNum = setNum,
-                    PartNum = part.num_parts,
+                    PartNum = part.part_num,
                     Name = part.name,
                     Quantity = part.quantity
                 };
@@ -112,13 +112,7 @@ namespace TheBrickVault.Components.Services
             public List<RebrickableLegoPart> Results { get; set; } = new();
         }
 
-        public class RebrickableLegoSetWithParts
-        {
-            public RebrickableLegoSet Set { get; set; }
-            public List<RebrickableLegoPart> Parts { get; set; } = new List<RebrickableLegoPart>();
-            // Initialize the list to avoid null reference exceptions
-
-        }
+        
 
     }
 }

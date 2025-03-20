@@ -38,7 +38,7 @@ height: auto; place-content: left; padding: 10px;"/>
             {
                 <tr>
                     <td>
-                        <button @onclick="() => SaveLegoSet(setWithParts.Set)" class="btn btn-success btn-sm">
+                        <button @onclick="() => SaveLegoSet(setWithParts)" class="btn btn-success btn-sm">
                             <i class="bi bi-save"></i> 
 
                         </button>
@@ -118,14 +118,13 @@ else
     //     {
     //         SetNum = legoSet.set_num,
     //         Name = legoSet.name,
-    //         PieceCount = legoSet.num_parts
+    //         PieceCount = legoSet.part_num
     //     };
     //     await DbContext.DbLegoSets.AddAsync(newLegoSet);
     //     await DbContext.SaveChangesAsync();
     //     await LoadUserLegoSets(); 
     // }
     
-
     //  block of code to use the SaveLegoSet method with the RebrickableLegoSetWithParts object instead of the FetchPartsForSetsAsync method.
     private async Task SaveLegoSet(RebrickableLegoSetWithParts setWithParts) 
     {
@@ -138,13 +137,13 @@ else
         await DbContext.DbLegoSets.AddAsync(newLegoSet);
         await DbContext.SaveChangesAsync();
 
-        foreach (var part in setsWithParts.Parts)
+        foreach (var part in setWithParts.Parts)
         {
             var newLegoPart = new DbLegoPart
                 {
                     PartNum = part.part_num,
                     Name = part.name,
-                    SetNum = setWithParts.Set.set_num,
+                    SetNum = part.set_num,
                     Quantity = part.quantity,
                     LegoSet = newLegoSet
                 };
