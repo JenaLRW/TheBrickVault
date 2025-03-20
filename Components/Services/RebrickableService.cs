@@ -89,17 +89,14 @@ namespace TheBrickVault.Components.Services
 
             foreach (var part in parts)
             {
-                //DbLegoPart existingPart = await _dbContext.DbLegoParts.FindAsync(setNum);
-                //if (existingPart != null)
-                //{
-                    DbLegoPart newLegoParts = new DbLegoPart
-                    {
-                        SetNum = setNum,
-                        PartNum = part.part_num,
-                        Quantity = part.quantity
-                    };
-                    await _dbContext.DbLegoParts.AddAsync(newLegoParts);
-                //}
+                DbLegoPart newLegoParts = new DbLegoPart
+                {
+                    SetNum = setNum,
+                    PartNum = part.part_num,
+                    Quantity = part.quantity
+                };
+                await _dbContext.DbLegoParts.AddAsync(newLegoParts);
+                
             }
             await _dbContext.SaveChangesAsync();
             return parts;
