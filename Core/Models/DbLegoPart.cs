@@ -8,15 +8,13 @@ namespace TheBrickVault.Core.Models
         [Key]
         public int Id { get; set; } 
         public string SetNum { get; set; } //no longer a foreign key
-        public string? PartNum { get; set; }
+        public string PartNum { get; set; } //this is required. 
+        
         //public string? Name { get; set; }
+
         public int? Quantity { get; set; }
 
-        //[ForeignKey("SetNum")]
-        //public DbLegoSet LegoSet { get; set; } //Navigation property to SetNum
-
-
-        //public string PartImageUrl { get; set; } maybe explore this later if time permits.
+       //public string PartImageUrl { get; set; } maybe explore this later if time permits.
 
     }
 }

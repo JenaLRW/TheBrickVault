@@ -52,9 +52,11 @@ height: auto; place-content: left; padding: 10px;"/>
     </table>
 }
 
+
+@*need to put in loading spinner here instead*@
 else if (searchPerformed && setsWithParts.Count == 0)
 {
-    <p>No Lego sets found.</p>
+    <p>No Lego Sets found.</p>
 }
 
 <h4> User's Lego Sets</h4>
@@ -64,6 +66,7 @@ else if (searchPerformed && setsWithParts.Count == 0)
     <table class="table mt-3">
         <thead>
             <tr>
+                <th>Delete Set</th>
                 <th>Set Number</th>
                 <th>Name</th>
                 <th>Number of Pieces</th>
@@ -73,7 +76,14 @@ else if (searchPerformed && setsWithParts.Count == 0)
         <tbody>
             @foreach (var legoSet in userLegoSets)
             {
+
                 <tr>
+                    <td>
+                        <button @onclick="() => DeleteLegoSet(legoSet)" class="btn btn-danger">
+                            <i class="bi bi-trash"></i>
+
+                        </button>
+                    </td>
                     <td>@legoSet.SetNum</td>
                     <td>@legoSet.Name</td>
                     <td>@legoSet.PieceCount</td>
@@ -111,23 +121,8 @@ else
     }
 
 
-    //SaveLegoSet method is triggered when the user clicks the save button, it saves the Lego set to the database.
-    // private async Task SaveLegoSet(RebrickableLegoSet legoSet)
-    // {
-    //     var newLegoSet = new DbLegoSet
-    //     {
-    //         SetNum = legoSet.set_num,
-    //         Name = legoSet.name,
-    //         PieceCount = legoSet.part_num
-    //     };
-    //     await DbContext.DbLegoSets.AddAsync(newLegoSet);
-    //     await DbContext.SaveChangesAsync();
-    //     await LoadUserLegoSets(); 
-    // }
-    
-
-
-    //  block of code to use the SaveLegoSet method with the RebrickableLegoSetWithParts object instead of the FetchPartsForSetsAsync method.
+   
+    //  block of code to use the SaveLegoSet method with the RebrickableLegoSetWithParts object.
     private async Task SaveLegoSet(RebrickableLegoSetWithParts setWithParts) 
     {
         var newLegoSet = new DbLegoSet
@@ -137,22 +132,24 @@ else
                 PieceCount = setWithParts.Set.num_parts
             };
         await DbContext.DbLegoSets.AddAsync(newLegoSet);
-        await DbContext.SaveChangesAsync();
-
-        // foreach (var part in setWithParts.Parts)
-        // {
-        //     var newLegoPart = new DbLegoPart
-        //         {
-        //             PartNum = part.part_num,
-        //             //Name = part.name,
-        //             SetNum = part.set_num,
-        //             Quantity = part.quantity,
-        //             LegoSet = newLegoSet
-        //         };
-        //     await DbContext.DbLegoParts.AddAsync(newLegoPart);
-        // }
-        // await DbContext.SaveChangesAsync();
+        await DbContext.SaveChangesAsync();            
         await LoadUserLegoSets();
+    }
+
+    //DeleteLegoSet method is triggered when the user clicks the delete button, it deletes the Lego set and parts from the database.
+    private async Task DeleteLegoSet(DbLegoSet legoSet)
+    {
+        var legoSetToDelete = await DbContext.DbLegoSets.FirstOrDefaultAsync(ls => ls.SetNum == legoSet.SetNum);
+        if (legoSetToDelete != null)
+        {
+            var partsToDelete = await DbContext.DbLegoParts.Where(DbLegoPart => DbLegoPart.SetNum == legoSet.SetNum).ToListAsync();
+            DbContext.DbLegoParts.RemoveRange(partsToDelete);
+
+            DbContext.DbLegoSets.Remove(legoSetToDelete);
+
+            await DbContext.SaveChangesAsync();
+            await LoadUserLegoSets();
+        }
     }
     
 
@@ -165,6 +162,7 @@ else
     //ClearSavedLegoSets method is triggered when the user clicks the clear button, it clears the Lego sets from the UI and the database.
     private async Task ClearSavedLegoSets()
     {
+        
         DbContext.DbLegoSets.RemoveRange(DbContext.DbLegoSets);
         await DbContext.SaveChangesAsync();
         await LoadUserLegoSets();
