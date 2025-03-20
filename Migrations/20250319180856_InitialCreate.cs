@@ -33,14 +33,13 @@ namespace TheBrickVault.Migrations
                 name: "DbLegoParts",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
                     SetNum = table.Column<string>(type: "TEXT", nullable: false),
-                    PartNum = table.Column<string>(type: "TEXT", nullable: true)
+                    PartNum = table.Column<string>(type: "TEXT", nullable: true),
+                    Quantity = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DbLegoParts", x => x.Id);
+                    table.PrimaryKey("PK_DbLegoParts", x => x.SetNum);
                     table.ForeignKey(
                         name: "FK_DbLegoParts_DbLegoSets_SetNum",
                         column: x => x.SetNum,
@@ -48,11 +47,6 @@ namespace TheBrickVault.Migrations
                         principalColumn: "SetNum",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DbLegoParts_SetNum",
-                table: "DbLegoParts",
-                column: "SetNum");
         }
 
         /// <inheritdoc />

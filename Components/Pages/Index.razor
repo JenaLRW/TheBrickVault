@@ -94,6 +94,9 @@ else
     private string searchQuery;
     private bool searchPerformed = false;
 
+
+    //this method is triggered when the user clicks the search button, it searches for Lego sets based on the search query.
+    // I still don't like it.  It will show up if the API is being a little slow to respond. I need to add a loading spinner instead.
     private async Task SearchLegoSets()
     {
         searchPerformed = true;
@@ -107,23 +110,58 @@ else
         }
     }
 
-    private async Task SaveLegoSet(RebrickableLegoSet legoSet)
+
+    //SaveLegoSet method is triggered when the user clicks the save button, it saves the Lego set to the database.
+    // private async Task SaveLegoSet(RebrickableLegoSet legoSet)
+    // {
+    //     var newLegoSet = new DbLegoSet
+    //     {
+    //         SetNum = legoSet.set_num,
+    //         Name = legoSet.name,
+    //         PieceCount = legoSet.num_parts
+    //     };
+    //     await DbContext.DbLegoSets.AddAsync(newLegoSet);
+    //     await DbContext.SaveChangesAsync();
+    //     await LoadUserLegoSets(); 
+    // }
+    
+
+    //  block of code to use the SaveLegoSet method with the RebrickableLegoSetWithParts object instead of the FetchPartsForSetsAsync method.
+    private async Task SaveLegoSet(RebrickableLegoSetWithParts setWithParts) 
     {
         var newLegoSet = new DbLegoSet
-        {
-            SetNum = legoSet.set_num,
-            Name = legoSet.name,
-            PieceCount = legoSet.num_parts
-        };
+            {
+                SetNum = setWithParts.Set.set_num,
+                Name = setWithParts.Set.name,
+                PieceCount = setWithParts.Set.num_parts
+            };
         await DbContext.DbLegoSets.AddAsync(newLegoSet);
         await DbContext.SaveChangesAsync();
-        await LoadUserLegoSets(); 
+
+        foreach (var part in setsWithParts.Parts)
+        {
+            var newLegoPart = new DbLegoPart
+                {
+                    PartNum = part.part_num,
+                    Name = part.name,
+                    SetNum = setWithParts.Set.set_num,
+                    Quantity = part.quantity,
+                    LegoSet = newLegoSet
+                };
+            await DbContext.DbLegoParts.AddAsync(newLegoPart);
+        }
+        await DbContext.SaveChangesAsync();
+        await LoadUserLegoSets();
     }
     
+
+    //LoadUserLegoSets method is triggered when the user clicks the save button, it loads the Lego sets to the UI and to the database. 
     private async Task LoadUserLegoSets()
     {
         userLegoSets = await DbContext.DbLegoSets.ToListAsync();
     }
+
+    //ClearSavedLegoSets method is triggered when the user clicks the clear button, it clears the Lego sets from the UI and the database.
     private async Task ClearSavedLegoSets()
     {
         DbContext.DbLegoSets.RemoveRange(DbContext.DbLegoSets);
