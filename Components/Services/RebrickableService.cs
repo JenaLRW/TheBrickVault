@@ -89,14 +89,20 @@ namespace TheBrickVault.Components.Services
 
             foreach (var part in parts)
             {
-                DbLegoPart newLegoParts = new DbLegoPart
+                // added existingPart to address exception handling for tracking multiple instances of the DbLegoPart entity with the same
+                // primary key value.
+                DbLegoPart existingPart = await _dbContext.DbLegoParts.FindAsync(setNum);
+                if (existingPart != null)
                 {
-                    SetNum = setNum,
-                    PartNum = part.part_num,
-                    Name = part.name,
-                    Quantity = part.quantity
-                };
-                await _dbContext.DbLegoParts.AddAsync(newLegoParts);
+                    DbLegoPart newLegoParts = new DbLegoPart
+                    {
+                        SetNum = setNum,
+                        PartNum = part.part_num,
+                        //Name = part.name,
+                        Quantity = part.quantity
+                    };
+                    await _dbContext.DbLegoParts.AddAsync(newLegoParts);
+                }
             }
             await _dbContext.SaveChangesAsync();
             return parts;

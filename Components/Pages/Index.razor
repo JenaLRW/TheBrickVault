@@ -137,19 +137,19 @@ else
         await DbContext.DbLegoSets.AddAsync(newLegoSet);
         await DbContext.SaveChangesAsync();
 
-        foreach (var part in setWithParts.Parts)
-        {
-            var newLegoPart = new DbLegoPart
-                {
-                    PartNum = part.part_num,
-                    Name = part.name,
-                    SetNum = part.set_num,
-                    Quantity = part.quantity,
-                    LegoSet = newLegoSet
-                };
-            await DbContext.DbLegoParts.AddAsync(newLegoPart);
-        }
-        await DbContext.SaveChangesAsync();
+        // foreach (var part in setWithParts.Parts)
+        // {
+        //     var newLegoPart = new DbLegoPart
+        //         {
+        //             PartNum = part.part_num,
+        //             //Name = part.name,
+        //             SetNum = part.set_num,
+        //             Quantity = part.quantity,
+        //             LegoSet = newLegoSet
+        //         };
+        //     await DbContext.DbLegoParts.AddAsync(newLegoPart);
+        // }
+        // await DbContext.SaveChangesAsync();
         await LoadUserLegoSets();
     }
     
