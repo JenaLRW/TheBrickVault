@@ -20,10 +20,22 @@ height: auto; place-content: left; padding: 10px;"/>
 <h4> Search Lego Sets </h4>
 
 <InputText @bind-Value="searchQuery" placeholder="Search by Set Number or Name" class="form-control" />
-<button class="btn btn-primary" @onclick="SearchLegoSets" style="margin: 10px;">Search</button>
 
-@if (setsWithParts != null && setsWithParts.Count > 0)
+<button class="btn btn-primary" @onclick="SearchLegoSets" disabled="@isLoadingSearch"style="margin: 10px;">Search</button>
+
+
+@if (isLoadingSearch)
 {
+    <p>Loading sets, please wait...</p>
+}
+
+else if (hasSearched && setsWithParts.Count == 0)
+{
+    <p>No Lego sets found.</p>
+}
+else if (hasSearched && setsWithParts.Count > 0)
+{
+
     <table class="table mt-3">
         <thead>
             <tr>
@@ -53,13 +65,12 @@ height: auto; place-content: left; padding: 10px;"/>
 }
 
 
-@*need to put in loading spinner here instead*@
-else if (searchPerformed && setsWithParts.Count == 0)
-{
-    <p>No Lego Sets found.</p>
-}
 
-<h4> User's Lego Sets</h4>
+
+
+<hr style="border: 1px solid; margin: 20px 0;" />
+
+<h4> Your Lego Sets</h4>
 
 @if (userLegoSets != null && userLegoSets.Count > 0)
 {
@@ -98,30 +109,84 @@ else
 }
 <button class="btn btn-danger" @onclick="ClearSavedLegoSets" style="margin: 10px;">Clear Saved Lego Sets</button>
 
+<hr style="border: 1px solid; margin: 20px 0;" />
+
+<h4>Find Matching Lego Sets</h4>
+
+<button @onclick="FindMatchingSets" disabled="@isLoadingMatches" class="btn btn-primary" style="margin: 10px;">Find Matching Sets</button>
+
+@if (isLoadingMatches)
+{
+    <p>Loading sets, please wait...</p>
+}
+
+else if (hasMatched && matchingSets.Count == 0)
+{
+    <p>No matching Lego sets found.</p>
+}
+else if (hasMatched && matchingSets.Count > 0)
+{
+    <table class="table mt-3">
+        <thead>
+            <tr>
+                <th>Set Number</th>
+                <th>Name</th>
+                <th>Number of Pieces</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var setWithParts in matchingSets)
+            {
+                <tr>
+                    <td>@setWithParts.Set.set_num</td>
+                    <td>@setWithParts.Set.name</td>
+                    <td>@setWithParts.Set.num_parts</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+
+
+
+
 @code {
     private List<RebrickableLegoSetWithParts> setsWithParts = new List<RebrickableLegoSetWithParts>();
     private List<DbLegoSet> userLegoSets = new List<DbLegoSet>();
     private string searchQuery;
-    private bool searchPerformed = false;
+    private bool isLoadingSearch = false;
+    private bool hasSearched = false;
+    private bool isLoadingMatches = false;
+    private bool hasMatched = false;
 
 
     //this method is triggered when the user clicks the search button, it searches for Lego sets based on the search query.
-    // I still don't like it.  It will show up if the API is being a little slow to respond. I need to add a loading spinner instead.
+
     private async Task SearchLegoSets()
     {
-        searchPerformed = true;
-        if (!string.IsNullOrWhiteSpace(searchQuery))
-        {
-            setsWithParts = await RebrickableService.FetchSetsAndPartsAsync(searchQuery);
-        }
-        else
-        {
-            setsWithParts.Clear();
-        }
+        isLoadingSearch = true;
+        hasSearched = true;
+
+        setsWithParts = await RebrickableService.FetchSetsAndPartsAsync(searchQuery);
+
+        isLoadingSearch = false;
+
+        StateHasChanged();
+
+        // if (!string.IsNullOrWhiteSpace(searchQuery))
+        // {
+        //     setsWithParts = await RebrickableService.FetchSetsAndPartsAsync(searchQuery);
+        // }
+        // else
+        // {
+        //     setsWithParts.Clear();
+        // }
     }
 
 
-   
+
     //  block of code to use the SaveLegoSet method with the RebrickableLegoSetWithParts object.
     private async Task SaveLegoSet(RebrickableLegoSetWithParts setWithParts) 
     {
@@ -151,7 +216,7 @@ else
             await LoadUserLegoSets();
         }
     }
-    
+
 
     //LoadUserLegoSets method is triggered when the user clicks the save button, it loads the Lego sets to the UI and to the database. 
     private async Task LoadUserLegoSets()
@@ -162,9 +227,22 @@ else
     //ClearSavedLegoSets method is triggered when the user clicks the clear button, it clears the Lego sets from the UI and the database.
     private async Task ClearSavedLegoSets()
     {
-        
+
         DbContext.DbLegoSets.RemoveRange(DbContext.DbLegoSets);
         await DbContext.SaveChangesAsync();
         await LoadUserLegoSets();
+    }
+
+    private List<RebrickableLegoSetWithParts> matchingSets = new();
+
+    private async Task FindMatchingSets()
+    {
+        isLoadingMatches = true;
+
+        matchingSets = await RebrickableService.FindMatchingSetsAsync();
+
+        isLoadingMatches = false;
+
+        StateHasChanged();
     }
 }

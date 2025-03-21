@@ -19,6 +19,5 @@ OR
 - Add the API key manually using this command: ```dotnet user-secrets set "Rebrickable:ApiKey" "the-api-key-here"```
 
 OR
-
 - Manually add the API key to SearchLegoSetsAsync and FetchPartsForSetsAsync methods in the RebrickableService.cs file. Replace the placeholder '{_apiKey}' with the actual API key.
 
