@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Storage.Json;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using Microsoft.EntityFrameworkCore.Storage.Json;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Text.Json;
@@ -97,11 +99,12 @@ namespace TheBrickVault.Components.Services
                     Quantity = part.quantity
                 };
                 await _dbContext.DbLegoParts.AddAsync(newLegoParts);
-                                
-                await _dbContext.SaveChangesAsync();
-                
 
-            } return parts;      
+                await _dbContext.SaveChangesAsync();
+
+
+            }
+            return parts;
         }
         public class RebrickableSearchResult
         {
@@ -112,7 +115,57 @@ namespace TheBrickVault.Components.Services
             public List<RebrickableLegoPart> Results { get; set; } = new();
         }
 
-        
+        //Query User's parts from DbLegoParts table
+        public async Task<Dictionary<int, int?>> GetUserPartsAsync()
+        //parameter inside GetUserPartsAsync() is nothing right now, but if needed, can add userId or something like that
+        {
+            var parts = await _dbContext.DbLegoParts
+                .GroupBy(p => p.InvPartId) //parts are grouped by InvPartId
+                .Select(g => new { InvPartId = g.Key, Quantity = g.Sum(p => p.Quantity) }) //InvPartId is the key, Quantity is the sum of all quantities for that InvPartId
+                .ToListAsync(); //convert to list
 
+            return parts.ToDictionary(p => p.InvPartId, p => p.Quantity); //convert the list from query to a dictionary, InvPartId = key, Quantity = value.
+        }
+
+        //Sensing an impending doom! This method is the final piece.  Please please please work.
+        //Find possible matches between Rebrickable's API and User's parts
+        public async Task<List<RebrickableLegoSetWithParts>> FindMatchingSetsAsync()
+        {
+            //Fetch user's parts from GetUserPartsAsync()
+            var userParts = await GetUserPartsAsync();
+
+            //Fetch all sets and corresponding parts from Rebrickable's API using FetchSetsAndPartsAsync method up above
+            var allDtoSetsWithParts = await FetchSetsAndPartsAsync("");
+
+            //Initalizes an empty list to store matching sets
+            var matchingSets = new List<RebrickableLegoSetWithParts>();
+
+            //loop through each Rebrickable's sets and its parts
+            foreach (var setWithParts in allDtoSetsWithParts)
+            {
+                //Check if user's parts match Rebrickable's sets of parts. If they do, add to matchingSets list.
+                bool partsMatch = true;
+
+                //Check if user's parts match the DTO's set's parts. 
+                foreach (var part in setWithParts.Parts)
+                {
+                    if (!userParts.ContainsKey(part.inv_part_id) && userParts[part.inv_part_id] < part.quantity)
+                    {
+                        partsMatch = false;
+                        break;
+                    }
+                    
+                }
+
+                //if all parts match, add to matching sets list
+                if (partsMatch)
+                {
+                    matchingSets.Add(setWithParts);
+                }
+            }
+
+            return matchingSets;
+
+        }
     }
 }
