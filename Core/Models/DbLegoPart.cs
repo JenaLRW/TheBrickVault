@@ -7,8 +7,10 @@ namespace TheBrickVault.Core.Models
     {
         [Key]
         public int Id { get; set; } 
+        public int InvPartId { get; set; } //this is required. Must convert JSON to handle data as an int. 
         public string SetNum { get; set; } //no longer a foreign key
-        public string PartNum { get; set; } //this is required. 
+
+        //public string? PartNum { get; set; }
         
         //public string? Name { get; set; }
 
