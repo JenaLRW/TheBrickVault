@@ -34,8 +34,8 @@ namespace TheBrickVault.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    InvPartId = table.Column<int>(type: "INTEGER", nullable: false),
                     SetNum = table.Column<string>(type: "TEXT", nullable: false),
-                    PartNum = table.Column<string>(type: "TEXT", nullable: true),
                     Quantity = table.Column<int>(type: "INTEGER", nullable: true),
                     DbLegoSetId = table.Column<int>(type: "INTEGER", nullable: true)
                 },

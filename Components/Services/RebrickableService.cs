@@ -92,16 +92,16 @@ namespace TheBrickVault.Components.Services
                 DbLegoPart newLegoParts = new DbLegoPart
                 {
                     SetNum = setNum,
-                    PartNum = part.part_num,
+                    InvPartId = part.inv_part_id,
+                    //PartNum = part.part_num,
                     Quantity = part.quantity
                 };
                 await _dbContext.DbLegoParts.AddAsync(newLegoParts);
+                                
+                await _dbContext.SaveChangesAsync();
                 
-            }
-            await _dbContext.SaveChangesAsync();
-            return parts;
-                
-                       
+
+            } return parts;      
         }
         public class RebrickableSearchResult
         {

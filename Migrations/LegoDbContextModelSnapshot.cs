@@ -25,8 +25,8 @@ namespace TheBrickVault.Migrations
                     b.Property<int?>("DbLegoSetId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("PartNum")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("InvPartId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("Quantity")
                         .HasColumnType("INTEGER");
