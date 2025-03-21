@@ -20,5 +20,5 @@ OR
 
 OR
 
-- Manually add the API key to SearchLegoSetsAsync and FetchPartsForSetsAsync methods in the RebrickableService.cs file. Replace the placeholder {_apiKey} with the actual API key._}
+- Manually add the API key to SearchLegoSetsAsync and FetchPartsForSetsAsync methods in the RebrickableService.cs file. Replace the placeholder '{_apiKey}' with the actual API key.
 
