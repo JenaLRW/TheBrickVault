@@ -53,7 +53,9 @@ namespace TheBrickVault.Components.Services
         // 4. Returns a list of RebrickableLegoSetWithParts objects.
         public async Task<List<RebrickableLegoSetWithParts>> FetchSetsAndPartsAsync(string searchQuery)
         {
-            var sets = await SearchLegoSetsAsync(searchQuery);
+
+
+            var sets = await SearchLegoSetsAsync(string.IsNullOrWhiteSpace(searchQuery) ? "lego" : searchQuery);
             var setsWithParts = new List<RebrickableLegoSetWithParts>();
 
             foreach (var set in sets)
@@ -67,18 +69,45 @@ namespace TheBrickVault.Components.Services
             }
             return setsWithParts;
         }
-
+        
         //use HttpClient to connect to Rebrickable's API endpoints and search for Lego sets.
         private async Task<List<RebrickableLegoSet>> SearchLegoSetsAsync(string searchQuery)
         {
+
+Console.WriteLine($"SearchLegoSetsAsync: Searching for sets with query '{searchQuery}'.");
+
+
             if (string.IsNullOrWhiteSpace(searchQuery))
             {
+Console.WriteLine("SearchLegoSetsAsync: Empty search query, returning no sets.");
+
                 return new List<RebrickableLegoSet>();
             }
 
             var url = $"{BaseUrl}?search={searchQuery}&key={_apiKey}";
-            var response = await _clientFactory.CreateClient().GetFromJsonAsync<RebrickableSearchResult>(url);
-            return response?.Results ?? new List<RebrickableLegoSet>();
+
+            try
+            {
+                var response = await _clientFactory.CreateClient().GetFromJsonAsync<RebrickableSearchResult>(url);
+
+                if (response?.Results != null)
+                {
+ Console.WriteLine($"SearchLegoSetsAsync: Found {response.Results.Count} sets.");
+                    return response.Results;
+                }
+                else
+                {
+ Console.WriteLine("SearchLegoSetsAsync: No sets found.");
+                    return new List<RebrickableLegoSet>();
+                }
+            }
+            catch (Exception ex)
+            {
+Console.WriteLine($"SearchLegoSetsAsync: API request failed: {ex.Message}");
+                return new List<RebrickableLegoSet>();
+            }
+
+            //return response?.Results ?? new List<RebrickableLegoSet>();
         }
 
 
@@ -131,11 +160,20 @@ namespace TheBrickVault.Components.Services
         //Find possible matches between Rebrickable's API and User's parts
         public async Task<List<RebrickableLegoSetWithParts>> FindMatchingSetsAsync()
         {
+//debugging
+Console.WriteLine("FindMatchingSetAsync started.");
+
             //Fetch user's parts from GetUserPartsAsync()
             var userParts = await GetUserPartsAsync();
 
+//debugging
+Console.WriteLine($"FindMatchingSetAsync fetched. {userParts.Count} user parts");
+
             //Fetch all sets and corresponding parts from Rebrickable's API using FetchSetsAndPartsAsync method up above
             var allDtoSetsWithParts = await FetchSetsAndPartsAsync("");
+
+//debugging
+Console.WriteLine($"FindMatchingSetAsync fetched. {allDtoSetsWithParts.Count} sets from API.");
 
             //Initalizes an empty list to store matching sets
             var matchingSets = new List<RebrickableLegoSetWithParts>();
@@ -149,12 +187,11 @@ namespace TheBrickVault.Components.Services
                 //Check if user's parts match the DTO's set's parts. 
                 foreach (var part in setWithParts.Parts)
                 {
-                    if (!userParts.ContainsKey(part.inv_part_id) && userParts[part.inv_part_id] < part.quantity)
+                    if (!userParts.ContainsKey(part.inv_part_id) || userParts[part.inv_part_id] < part.quantity)
                     {
                         partsMatch = false;
                         break;
-                    }
-                    
+                    }                  
                 }
 
                 //if all parts match, add to matching sets list
@@ -163,6 +200,9 @@ namespace TheBrickVault.Components.Services
                     matchingSets.Add(setWithParts);
                 }
             }
+
+//debugging
+Console.WriteLine($"FindMatchingSetAsync found {matchingSets.Count} matching sets.");
 
             return matchingSets;
 
