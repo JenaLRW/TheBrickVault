@@ -1,7 +1,7 @@
 
 
 <div align="center">
-<img src="https://github.com/user-attachments/assets/cad4e297-cfb3-40ff-934c-d63ddd30128a" width="" height="100" alt="line up of various LEGO minifigs" /><img src="https://github.com/user-attachments/assets/37936108-c2fe-47a1-afb7-d0027f2ba1e6" width="200" height="200" alt="Treasure chest full of colorful LEGO bricks" /><img src="https://github.com/user-attachments/assets/088cffbb-2afd-4438-bbe0-806204b3e425" width="" height="100" alt="line up of various LEGO minifigs" /></div>
+<img src="https://github.com/user-attachments/assets/cad4e297-cfb3-40ff-934c-d63ddd30128a" width="" height="75" alt="line up of various LEGO minifigs" /><img src="https://github.com/user-attachments/assets/37936108-c2fe-47a1-afb7-d0027f2ba1e6" width="150" height="150" alt="Treasure chest full of colorful LEGO bricks" /><img src="https://github.com/user-attachments/assets/088cffbb-2afd-4438-bbe0-806204b3e425" width="" height="75" alt="line up of various LEGO minifigs" /></div>
 
 
 
