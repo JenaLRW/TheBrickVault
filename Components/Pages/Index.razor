@@ -3,8 +3,9 @@
 @using TheBrickVault.Infrastructure.Data
 @using TheBrickVault.Core.DTO
 
-@page "/"
 
+@page "/"
+@rendermode InteractiveServer
 @inject LegoDbContext DbContext
 @inject RebrickableService RebrickableService
 
@@ -65,7 +66,7 @@ else if (hasSearched && setsWithParts.Count > 0)
     @if (hasMoreSets)
     {
         <p>[DEBUG] Load More Button should be visible</p>
-        <button class="btn btn-secondary" @onclick="LoadMoreSets" disabled="@isLoadingMore || !hasMoreSets" style="margin: 10px;">Load More</button>
+        <button class="btn btn-secondary" @onclick="async () => await LoadMoreSets()" style="margin: 10px;">Load More</button>
     }
     else
     {
@@ -126,7 +127,7 @@ else
 
 <h4>Find Matching Lego Sets</h4>
 
-<button @onclick="FindMatchingSets" disabled="@isLoadingMatches" class="btn btn-primary" style="margin: 10px;">Find Matching Sets</button>
+<button @onclick="FindMatchingSets" class="btn btn-primary" style="margin: 10px;">Find Matching Sets</button>
 
 @if (isLoadingMatches)
 {
@@ -187,7 +188,7 @@ else if (hasMatched && matchingSets.Count > 0)
 
 
 
-    private async Task SearchLegoSets()   //this method is triggered when the user clicks the search button, it searches for Lego sets based on the search query.
+    private async Task SearchLegoSets()   //this method is triggered when the user clicks the search button
     {
         isLoadingSearch = true;
         hasSearched = true;
@@ -202,11 +203,20 @@ else if (hasMatched && matchingSets.Count > 0)
         {
             hasMoreSets = false;
         }
+        else //Preload next page silently in the background
+        {
+            var moreSets = await RebrickableService.FetchSetsAndPartsAsync(searchQuery, currentPage + 1, 10);
+            if (moreSets.Count == 0)
+            {
+                hasMoreSets = false;
+            }
+        }
         Console.WriteLine($"[DEBUG] SearchLegoSets: loaded {initialSets.Count} sets. Has more sets: {hasMoreSets}"); 
 
         isLoadingSearch = false;
 
-        StateHasChanged();
+        await InvokeAsync(() => { });
+        //StateHasChanged();
         await Task.Delay(1);
 
     }
@@ -218,10 +228,8 @@ else if (hasMatched && matchingSets.Count > 0)
         isLoadingMore = true;
         currentPage++;
 
-        var moreSets = await RebrickableService.FetchSetsAndPartsAsync(searchQuery, currentPage, 10);
-
-        // var nextSets = moreSets.Skip(currentPage * 10).Take(10).ToList();
-
+        var moreSets = await RebrickableService.FetchSetsAndPartsAsync(searchQuery, currentPage + 1, 10);
+                
         if (moreSets.Count < 10)
         {
             hasMoreSets = false;
