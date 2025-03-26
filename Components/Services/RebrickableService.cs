@@ -10,6 +10,7 @@ using System.Security.Cryptography.X509Certificates;
 using TheBrickVault.Core.DTO;
 using TheBrickVault.Core.Models;
 using TheBrickVault.Infrastructure.Data;
+using Microsoft.AspNetCore.RateLimiting;
 
 
 
@@ -38,12 +39,9 @@ namespace TheBrickVault.Components.Services
         {
 
             _clientFactory = clientFactory;
-            //this is to get the API key from UserSecrets
-            _apiKey = configuration["Rebrickable:ApiKey"];
+            _apiKey = configuration["Rebrickable:ApiKey"];   //this is to get the API key from UserSecrets
             _dbContext = dbContext;
-
         }
-
 
         //use HttpClient to connect to Rebrickable's API endpoints and search for Lego sets and their parts in a single method.
         //AI explanation: functionality -
@@ -51,11 +49,9 @@ namespace TheBrickVault.Components.Services
         // 2. Iterates over each set and calls FetchPartsForSetsAsync to fetch the parts for each set.
         // 3. Combines each set with its parts into a RebrickableLegoSetWithParts object.
         // 4. Returns a list of RebrickableLegoSetWithParts objects.
-        public async Task<List<RebrickableLegoSetWithParts>> FetchSetsAndPartsAsync(string searchQuery)
+        public async Task<List<RebrickableLegoSetWithParts>> FetchSetsAndPartsAsync(string searchQuery, int currentPage = 1, int resultsPerPage = 10)
         {
-
-
-            var sets = await SearchLegoSetsAsync(string.IsNullOrWhiteSpace(searchQuery) ? "lego" : searchQuery);
+            var sets = await SearchLegoSetsAsync(searchQuery, currentPage, resultsPerPage);
             var setsWithParts = new List<RebrickableLegoSetWithParts>();
 
             foreach (var set in sets)
@@ -66,53 +62,48 @@ namespace TheBrickVault.Components.Services
                     Set = set,
                     Parts = parts
                 });
+                //await Task.Delay(500); // Delay to avoid hitting the API rate limit
             }
+            Console.WriteLine($"[DEBUG] FetchSetsAndPartsAsync: Loaded {setsWithParts.Count} sets on page {currentPage}");
+
             return setsWithParts;
         }
+
         
-        //use HttpClient to connect to Rebrickable's API endpoints and search for Lego sets.
-        private async Task<List<RebrickableLegoSet>> SearchLegoSetsAsync(string searchQuery)
+
+        private async Task<List<RebrickableLegoSet>> SearchLegoSetsAsync(string searchQuery, int currentPage = 1, int resultsPerPage = 10)
         {
-
-Console.WriteLine($"SearchLegoSetsAsync: Searching for sets with query '{searchQuery}'.");
-
+            Console.WriteLine($"[DEBUG] SearchLegoSetsAsync: Searching for sets with query '{searchQuery}'.");
 
             if (string.IsNullOrWhiteSpace(searchQuery))
             {
-Console.WriteLine("SearchLegoSetsAsync: Empty search query, returning no sets.");
+                Console.WriteLine($"[DEBUG] SearchLegoSetsAsync: Empty search query, returning no sets.");
 
                 return new List<RebrickableLegoSet>();
             }
 
-            var url = $"{BaseUrl}?search={searchQuery}&key={_apiKey}";
+            var url = $"{BaseUrl}?search={searchQuery}&key={_apiKey}&page={currentPage}&page_size={resultsPerPage}&inc_color_details=0";
 
             try
             {
                 var response = await _clientFactory.CreateClient().GetFromJsonAsync<RebrickableSearchResult>(url);
+                var sets = response?.Results ?? new List<RebrickableLegoSet>();
 
-                if (response?.Results != null)
-                {
- Console.WriteLine($"SearchLegoSetsAsync: Found {response.Results.Count} sets.");
-                    return response.Results;
-                }
-                else
-                {
- Console.WriteLine("SearchLegoSetsAsync: No sets found.");
-                    return new List<RebrickableLegoSet>();
-                }
+                Console.WriteLine($"[DEBUG] SearchLegoSetsAsync: Found {sets.Count} sets on page {currentPage}.");
+                return sets;
             }
             catch (Exception ex)
             {
-Console.WriteLine($"SearchLegoSetsAsync: API request failed: {ex.Message}");
+                Console.WriteLine($"[DEBUG] SearchLegoSetsAsync: API request failed: {ex.Message}");
                 return new List<RebrickableLegoSet>();
             }
-
-            //return response?.Results ?? new List<RebrickableLegoSet>();
         }
 
 
-        //fetch parts for a specific set from Rebrickable's API.
-        public async Task<List<RebrickableLegoPart>> FetchPartsForSetsAsync(string setNum)
+
+
+
+        public async Task<List<RebrickableLegoPart>> FetchPartsForSetsAsync(string setNum)   //fetch parts for a specific set from Rebrickable's API.
         {
             var url = $"{BaseUrl}{setNum}/parts/?key={_apiKey}";
             var response = await _clientFactory.CreateClient().GetFromJsonAsync<RebrickablePartsResult>(url);
@@ -124,17 +115,18 @@ Console.WriteLine($"SearchLegoSetsAsync: API request failed: {ex.Message}");
                 {
                     SetNum = setNum,
                     InvPartId = part.inv_part_id,
-                    //PartNum = part.part_num,
                     Quantity = part.quantity
                 };
                 await _dbContext.DbLegoParts.AddAsync(newLegoParts);
 
                 await _dbContext.SaveChangesAsync();
 
-
             }
             return parts;
         }
+
+
+
         public class RebrickableSearchResult
         {
             public List<RebrickableLegoSet> Results { get; set; } = new();
@@ -144,68 +136,391 @@ Console.WriteLine($"SearchLegoSetsAsync: API request failed: {ex.Message}");
             public List<RebrickableLegoPart> Results { get; set; } = new();
         }
 
-        //Query User's parts from DbLegoParts table
-        public async Task<Dictionary<int, int?>> GetUserPartsAsync()
-        //parameter inside GetUserPartsAsync() is nothing right now, but if needed, can add userId or something like that
+
+
+        
+        public async Task<Dictionary<int, int?>> GetUserPartsAsync()   //Query User's parts from DbLegoParts table
+        
         {
             var parts = await _dbContext.DbLegoParts
-                .GroupBy(p => p.InvPartId) //parts are grouped by InvPartId
-                .Select(g => new { InvPartId = g.Key, Quantity = g.Sum(p => p.Quantity) }) //InvPartId is the key, Quantity is the sum of all quantities for that InvPartId
-                .ToListAsync(); //convert to list
+                .GroupBy(p => p.InvPartId) 
+                .Select(g => new { InvPartId = g.Key, Quantity = g.Sum(p => p.Quantity ?? 0) }) 
+                .ToListAsync(); 
 
-            return parts.ToDictionary(p => p.InvPartId, p => p.Quantity); //convert the list from query to a dictionary, InvPartId = key, Quantity = value.
+            return parts.ToDictionary(p => p.InvPartId, p => (int?)p.Quantity); 
         }
 
-        //Sensing an impending doom! This method is the final piece.  Please please please work.
-        //Find possible matches between Rebrickable's API and User's parts
-        public async Task<List<RebrickableLegoSetWithParts>> FindMatchingSetsAsync()
+
+
+
+       
+
+        public async Task<List<RebrickableLegoSetWithParts>> FindMatchingSetsAsync(int currentPage = 1, int resultsPerPage = 1000)
         {
-//debugging
-Console.WriteLine("FindMatchingSetAsync started.");
+            Console.WriteLine("[DEBUG] FindMatchingSetsAsync started.");
 
-            //Fetch user's parts from GetUserPartsAsync()
-            var userParts = await GetUserPartsAsync();
+            var userParts = await GetUserPartsAsync(); //fetch user's parts from GetUserPartsAsync()
 
-//debugging
-Console.WriteLine($"FindMatchingSetAsync fetched. {userParts.Count} user parts");
+            Console.WriteLine($"[DEBUG] User has {userParts.Count} parts.");
 
-            //Fetch all sets and corresponding parts from Rebrickable's API using FetchSetsAndPartsAsync method up above
-            var allDtoSetsWithParts = await FetchSetsAndPartsAsync("");
+            var allDtoSetsWithParts = await FetchAllSetsAndPartsAsync(currentPage, resultsPerPage);
 
-//debugging
-Console.WriteLine($"FindMatchingSetAsync fetched. {allDtoSetsWithParts.Count} sets from API.");
+            Console.WriteLine($"[DEBUG] Found {allDtoSetsWithParts.Count} sets from Rebrickable on page {currentPage}.");
 
-            //Initalizes an empty list to store matching sets
             var matchingSets = new List<RebrickableLegoSetWithParts>();
 
-            //loop through each Rebrickable's sets and its parts
-            foreach (var setWithParts in allDtoSetsWithParts)
+            foreach (var setWithParts in allDtoSetsWithParts) //Filtering logic
             {
-                //Check if user's parts match Rebrickable's sets of parts. If they do, add to matchingSets list.
+                Console.WriteLine($"[DEBUG] Set Name: {setWithParts.Set.name}, Parts: {setWithParts.Set.num_parts}");
+
+                if (setWithParts.Set.num_parts <= 30)
+                {
+                    Console.WriteLine($"[DEBUG] Skipping set {setWithParts.Set.name} because it has too few parts.");
+                    continue;
+                }
+
+                string setNameLower = setWithParts.Set.name.ToLower();
+                if (setNameLower.Contains("minifigs") ||
+                    setNameLower.Contains("Figures") ||
+                    setNameLower.Contains("duplo") ||
+                    setNameLower.Contains("pack") ||
+                    setNameLower.Contains("dots") ||
+                    setNameLower.Contains("assorted") ||
+                    setNameLower.Contains("1:87"))
+
+                {
+                    Console.WriteLine($"[DEBUG] Skipping set {setWithParts.Set.name}.");
+                    continue;
+                }
+
+
                 bool partsMatch = true;
 
-                //Check if user's parts match the DTO's set's parts. 
                 foreach (var part in setWithParts.Parts)
                 {
-                    if (!userParts.ContainsKey(part.inv_part_id) || userParts[part.inv_part_id] < part.quantity)
+                    if (!userParts.TryGetValue(part.inv_part_id, out int? userQuantity) || userQuantity < part.quantity)
                     {
                         partsMatch = false;
                         break;
-                    }                  
+                    }
                 }
-
-                //if all parts match, add to matching sets list
                 if (partsMatch)
                 {
+                    Console.WriteLine($"[DEBUG] Found matching set: {setWithParts.Set.name}");
                     matchingSets.Add(setWithParts);
                 }
             }
 
-//debugging
-Console.WriteLine($"FindMatchingSetAsync found {matchingSets.Count} matching sets.");
+            Console.WriteLine($"[DEBUG] Found {matchingSets.Count} sets from Rebrickable.");
+            return matchingSets;                    
+    
+        }
 
-            return matchingSets;
 
+
+        private int GetTotalUserParts()
+        {
+            return _dbContext.DbLegoParts.Sum(p => p.Quantity) ?? 0;
+        }
+
+
+
+        //New method to fetch all sets and corresponding parts from the API.  Similar to SearchLegoSetsAsync but without a search query.
+        public async Task<List<RebrickableLegoSetWithParts>> FetchAllSetsAndPartsAsync(int currentPage, int resultsPerPage)
+        {
+            Console.WriteLine("[DEBUG] FetchAllSetsAndPartsAsync started.");
+
+            var allSetsWithParts = new List<RebrickableLegoSetWithParts>();
+            var url = $"{BaseUrl}?key={_apiKey}&page={currentPage}&page_size={resultsPerPage}&inc_color_details=0";
+            bool startAdding = false;
+
+            try
+            {
+                var response = await _clientFactory.CreateClient().GetFromJsonAsync<RebrickableSearchResult>(url);
+                var currentResults = response?.Results ?? new List<RebrickableLegoSet>();
+
+                if (currentResults.Count == 0)
+                {
+                    Console.WriteLine($"[DEBUG] No more results on page {currentPage}. Stopping search.");
+                    return allSetsWithParts;
+                }
+
+                foreach (var set in currentResults)
+                {
+                    if (set.set_num == "10001_1")
+                    {
+                        startAdding = true;
+                    }
+
+                    if (startAdding)
+                    {
+                        var parts = await FetchPartsForSetsAsync(set.set_num);
+                        allSetsWithParts.Add(new RebrickableLegoSetWithParts
+                        {
+                            Set = set,
+                            Parts = parts
+                        });
+                    }
+                }
+
+                Console.WriteLine($"[DEBUG] FetchAllSetsAndPartsAsync: Found {currentResults.Count} sets on page {currentPage}.");
+
+
+                await Task.Delay(1200);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DEBUG] FetchAllSetsAndPartsAsync: API request failed on page {currentPage}: {ex.Message}");
+
+            }
+
+
+            Console.WriteLine($"[DEBUG] FetchAllSetsAndPartsAsync: Found {allSetsWithParts.Count} sets in total.");
+            return allSetsWithParts;
         }
     }
 }
+
+
+
+
+
+//use HttpClient to connect to Rebrickable's API endpoints and search for Lego sets. Added API optimizations. 
+//private async Task<List<RebrickableLegoSet>> SearchLegoSetsAsync(string searchQuery, int startPage = 1, int maxPages = 10, int resultsPerPage = 10)
+//{
+//    //debugging
+//    Console.WriteLine($"[DEBUG] SearchLegoSetsAsync: Searching for sets with query '{searchQuery}'.");
+
+
+//    if (string.IsNullOrWhiteSpace(searchQuery))
+//    {
+//        //debugging
+//        Console.WriteLine("[DEBUG] SearchLegoSetsAsync: Empty search query, returning no sets.");
+
+//        return new List<RebrickableLegoSet>();
+//    }
+
+//    int currentPage = startPage;
+//    var sets = new List<RebrickableLegoSet>();
+
+//    while (currentPage < startPage + maxPages)
+//    {
+//        var url = $"{BaseUrl}?search={searchQuery}&key={_apiKey}&page={currentPage}&page_size={resultsPerPage}&inc_color_details=0";
+//        Console.WriteLine($"[DEBUG] Fetching from url: {url}");
+
+//        //debugging try/catch
+//        try
+//        {
+//            var response = await _clientFactory.CreateClient().GetFromJsonAsync<RebrickableSearchResult>(url);
+//            var currentResults = response?.Results ?? new List<RebrickableLegoSet>();
+
+//            if (currentResults.Count == 0)
+//            {
+//                Console.WriteLine($"[DEBUG] No more results on page {currentPage}. Stopping search.");
+//                break;
+//            }
+
+//            sets.AddRange(currentResults);
+//            Console.WriteLine($"[DEBUG] SearchLegoSetsAsync: Found {currentResults.Count} sets on page {currentPage}.");
+
+//            if (currentResults.Count < resultsPerPage)
+//            {
+//                Console.WriteLine($"[DEBUG] Page {currentPage} returned fewer than {resultsPerPage} results. No more pages available.");
+//                break;
+//            }
+
+//            currentPage++;
+//        }
+
+//        catch (Exception ex)
+//        {
+//            Console.WriteLine($"[DEBUG] SearchLegoSetsAsync: API request failed on page {currentPage}: {ex.Message}");
+//            break; //exit the loop on error
+//        }
+//    }
+
+//    Console.WriteLine($"[DEBUG] SearchLegoSetsAsync: Found {sets.Count} sets in total.");
+//    return sets;
+//}
+
+
+
+
+
+//private async Task<List<RebrickableLegoSet>> SearchLegoSetsAsync(string searchQuery)   //use HttpClient to connect to Rebrickable's API endpoints and search for Lego sets.  
+//{
+
+//    Console.WriteLine($"[DEBUG]  SearchLegoSetsAsync: Searching for sets with query '{searchQuery}'.");
+
+
+//    if (string.IsNullOrWhiteSpace(searchQuery))
+//    {
+//        Console.WriteLine("[DEBUG] SearchLegoSetsAsync: Empty search query, returning no sets.");
+
+//        return new List<RebrickableLegoSet>();
+//    }
+
+//    var url = $"{BaseUrl}?search={searchQuery}&key={_apiKey}";
+
+//    try
+//    {
+//        var response = await _clientFactory.CreateClient().GetFromJsonAsync<RebrickableSearchResult>(url);
+
+//        if (response?.Results != null)
+//        {
+//            Console.WriteLine($"[DEBUG] SearchLegoSetsAsync: Found {response.Results.Count} sets.");
+//            return response.Results;
+//        }
+//        else
+//        {
+//            Console.WriteLine("[DEBUG] SearchLegoSetsAsync: No sets found.");
+//            return new List<RebrickableLegoSet>();
+//        }
+//    }
+//    catch (Exception ex)
+//    {
+//        Console.WriteLine($"[DEBUG] SearchLegoSetsAsync: API request failed: {ex.Message}");
+//        return new List<RebrickableLegoSet>();
+//    }                        
+//}
+
+
+
+
+
+
+
+//Find possible matches between Rebrickable's API and User's parts.  Filtering logic included. 
+//    public async Task<List<RebrickableLegoSetWithParts>> FindMatchingSetsAsync()
+//    {
+//        Console.WriteLine("[DEBUG] FindMatchingSetsAsync started.");
+
+//        //fetch user's parts from GetUserPartsAsync()
+//        var userParts = await GetUserPartsAsync();
+
+//        Console.WriteLine($"[DEBUG] User has {userParts.Count} parts.");
+
+//        var matchingSets = new List<RebrickableLegoSetWithParts>();
+
+//        int currentPage = 2;
+//        int resultsPerPage = 1000;
+//        int maxMatches = 10;
+
+//        while (matchingSets.Count < maxMatches)
+//        {
+//            var allDtoSetsWithParts = await FetchAllSetsAndPartsAsync(currentPage, resultsPerPage);
+//            if (allDtoSetsWithParts.Count == 0)
+//            {
+//                Console.WriteLine($"[DEBUG] No more results on page {currentPage}. Stopping search.");
+//                break;
+//            }
+
+//            Console.WriteLine($"[DEBUG] Found {allDtoSetsWithParts.Count} sets from Rebrickable on page {currentPage}.");
+
+//            foreach (var setWithParts in allDtoSetsWithParts) //Filtering logic
+//            {
+//                Console.WriteLine($"[DEBUG] Set Name: {setWithParts.Set.name}, Parts: {setWithParts.Set.num_parts}");
+
+//                if (setWithParts.Set.num_parts <= 30)
+//                {
+//                    Console.WriteLine($"[DEBUG] Skipping set {setWithParts.Set.name} because it has too few parts.");
+//                    continue;
+//                }
+
+//                string setNameLower = setWithParts.Set.name.ToLower();
+//                if (setNameLower.Contains("minifigs") ||
+//                    setNameLower.Contains("Figures") ||
+//                    setNameLower.Contains("duplo") ||
+//                    setNameLower.Contains("pack") ||
+//                    setNameLower.Contains("dots") ||
+//                    setNameLower.Contains("assorted") ||
+//                    setNameLower.Contains("1:87"))
+
+//                {
+//                    Console.WriteLine($"[DEBUG] Skipping set {setWithParts.Set.name}.");
+//                    continue;
+//                }
+
+
+//                bool partsMatch = true;
+
+//                foreach (var part in setWithParts.Parts)
+//                {
+//                    if (!userParts.TryGetValue(part.inv_part_id, out int? userQuantity) || userQuantity < part.quantity)
+//                    {
+//                        partsMatch = false;
+//                        break;
+//                    }
+//                }
+//                if (partsMatch)
+//                {
+//                    Console.WriteLine($"[DEBUG] Found matching set: {setWithParts.Set.name}");
+//                    matchingSets.Add(setWithParts);
+//                    if (matchingSets.Count >= maxMatches) 
+//                        break;
+//                }
+//            }
+//            await Task.Delay(5000);
+//            currentPage++;
+//        }
+
+//        Console.WriteLine($"[DEBUG] Found {matchingSets.Count} sets from Rebrickable.");
+//        return matchingSets;
+//    }
+
+
+
+//    private int GetTotalUserParts()
+//    {
+//        return _dbContext.DbLegoParts.Sum(p => p.Quantity) ?? 0;
+//    }
+
+
+
+//    //New method to fetch all sets and corresponding parts from the API.  Similar to SearchLegoSetsAsync but without a search query.
+//    public async Task<List<RebrickableLegoSetWithParts>> FetchAllSetsAndPartsAsync(int currentPage, int resultsPerPage)
+//    { 
+//        Console.WriteLine("[DEBUG] FetchAllSetsAndPartsAsync started.");
+
+//        var allSetsWithParts = new List<RebrickableLegoSetWithParts>();
+//        var url = $"{BaseUrl}?key={_apiKey}&page={currentPage}&page_size={resultsPerPage}&inc_color_details=0";
+
+//        try
+//        {
+//            var response = await _clientFactory.CreateClient().GetFromJsonAsync<RebrickableSearchResult>(url);
+//            var currentResults = response?.Results ?? new List<RebrickableLegoSet>();
+
+//            if (currentResults.Count == 0)
+//            {
+//                Console.WriteLine($"[DEBUG] No more results on page {currentPage}. Stopping search.");
+//                return allSetsWithParts;
+//            }
+
+//            foreach (var set in currentResults)
+//            {
+//                var parts = await FetchPartsForSetsAsync(set.set_num);
+//                allSetsWithParts.Add(new RebrickableLegoSetWithParts
+//                {
+//                    Set = set,
+//                    Parts = parts
+//                });
+//            }
+
+//            Console.WriteLine($"[DEBUG] FetchAllSetsAndPartsAsync: Found {currentResults.Count} sets on page {currentPage}.");
+
+
+//            await Task.Delay(1200);
+
+//        }
+//        catch (Exception ex)
+//        {
+//            Console.WriteLine($"[DEBUG] FetchAllSetsAndPartsAsync: API request failed on page {currentPage}: {ex.Message}");
+
+//        }
+
+
+//        Console.WriteLine($"[DEBUG] FetchAllSetsAndPartsAsync: Found {allSetsWithParts.Count} sets in total.");
+//        return allSetsWithParts;
+//    }
+//}
