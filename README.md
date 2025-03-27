@@ -23,12 +23,19 @@ Software Development Capstone Features List:
 - There are two related entities: DbLegoParts and RebrickableLegoSet. The DbLegoParts table stores information about the Lego parts a user has, while the RebrickableLegoSet table contains details about different Lego sets from the Rebrickable API. The function FindMatchingSetsAsync is responsible for finding sets that can be built using the parts the user has. It compares the user's parts with the parts required for each Lego set and returns a list of sets that can be constructed with the user's available pieces. This approach effectively combines data from both entities to identify matching Lego sets based on the user's inventory, providing a valuable feature for managing and utilizing their Lego collection.
 - Implemented pagination for API requests to Rebrickable, allowing search results to load in batches of 10 sets per page. Users can request additional pages as needed, reducing the number of API calls and improving performance by only fetching more results when necessary.
 - "The Brick Vault" implements CRUD operations by allowing users to CREATE Lego set entries by saving search results from the Rebrickable API to a local database. Users can READ saved sets by displaying them in the UI. The project does not support UPDATES since set details are read-only. However, users can DELETE sets from their collection, removing them from the database.
-- 
+
+
 FYI, code contains a lot of comments. Without comments, I will get lost and unfortunately, I don't have very good memory recollection either.  Bear with me.
 
 ## Instructions
 
 Firefox may give you some drama. Google handles it better. Enter at your own risk. 
+API optimizations are not the best and with time restrictions, 
+
+### Download the app from Github
+- Open the ```.csproj``` file
+- Run in terminal in the project's root folder: ```dotnet restore```
+- Build the project: ```dotnet build```
 
 ### API Key is required.
 - Retrieve the API key from the director or me on Slack or create a new account on Rebrickable.com and generate your own API key.
@@ -50,16 +57,29 @@ OR
 OR (Not recommended)
 - Manually add the API key to SearchLegoSetsAsync and FetchPartsForSetsAsync methods in the RebrickableService.cs file. Replace the placeholder ```{_apiKey}``` with the actual API key.
 
-## Improvements
+### Test run data
+- In the first search bar to look up Lego Sets
+  - Enter "71043" (Hogwarts Castle - has quite a bit of a collection of parts)
+  - Click on save.
+  - Enter "Race Car"
+  - Click on save on a set with more than 0 pieces.
+- Click on Find Matching Sets.
+  - If the database has a very high number of parts, the API potentially will be called too much and you will get a "Too many requests" failure. *I am working very diligently to find an optimization that will perform well with the app*
 
-- More organization, more separate files for all of the classes and methods
+## Improvements Needed
+
+- Unit tests
+- Better API optimizations
+- More IDE organization, more separate files for all of the classes and methods
 - More defined search options
 - Follow SOLID principles more closely
+- Categorize sets to match user's parts by theme
 
 
 
 
 
-Many many many thanks to Code:You and their staff and mentors for their guidance: Jenny Terry, August Mapp, Brian Luerman, Chris Metcalfe, Charles Kayser, and Michael Paddock.
+
+Many many many thanks to Code:You and their staff and mentors for their guidance: Jenny Terry, August Mapp, Brian Luerman, Chris Metcalfe, Charles Kayser, and Michael Paddock. A few international friends as well. 
 
 
