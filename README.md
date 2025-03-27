@@ -59,7 +59,7 @@ OR (Not recommended)
 
 ### Test run data
 - In the first search bar to look up Lego Sets
-  - Enter "71043" (Hogwarts Castle - has quite a bit of a collection of parts)
+  - Enter "71043" (Hogwarts Castle - has quite a bit of parts)
   - Click on save.
   - Enter "Race Car"
   - Click on save on a set with more than 0 pieces.
