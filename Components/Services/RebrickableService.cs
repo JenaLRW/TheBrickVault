@@ -247,20 +247,20 @@ namespace TheBrickVault.Components.Services
 
                 foreach (var set in currentResults)
                 {
-                    if (set.set_num == "10001_1")
-                    {
-                        startAdding = true;
-                    }
+                    //if (set.set_num == "10001_1")
+                    //{
+                    //    startAdding = true;
+                    //}
 
-                    if (startAdding)
-                    {
+                    //if (startAdding)
+                    //{
                         var parts = await FetchPartsForSetsAsync(set.set_num);
                         allSetsWithParts.Add(new RebrickableLegoSetWithParts
                         {
                             Set = set,
                             Parts = parts
                         });
-                    }
+                    //}
                 }
 
                 Console.WriteLine($"[DEBUG] FetchAllSetsAndPartsAsync: Found {currentResults.Count} sets on page {currentPage}.");
