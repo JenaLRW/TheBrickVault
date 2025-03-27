@@ -30,7 +30,6 @@ FYI, code contains a lot of comments. Without comments, I will get lost and unfo
 ## Instructions
 
 Firefox may give you some drama. Google handles it better. Enter at your own risk. 
-API optimizations are not the best and with time restrictions, 
 
 ### Download the app from Github
 - Open the ```.csproj``` file
