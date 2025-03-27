@@ -22,7 +22,7 @@ height: auto; place-content: left; padding: 10px;"/>
 
 <InputText @bind-Value="searchQuery" placeholder="Search by Set Number or Name" class="form-control" />
 
-<button class="btn btn-primary" @onclick="SearchLegoSets" disabled="@isLoadingSearch"style="margin: 10px;">Search</button>
+<button class="btn btn-primary" @onclick="SearchLegoSets" style="margin: 10px;">Search</button>
 
 
 @if (isLoadingSearch)
@@ -64,13 +64,12 @@ else if (hasSearched && setsWithParts.Count > 0)
         </tbody>
     </table>
     @if (hasMoreSets)
-    {
-        <p>[DEBUG] Load More Button should be visible</p>
+    {        
         <button class="btn btn-secondary" @onclick="async () => await LoadMoreSets()" style="margin: 10px;">Load More</button>
     }
     else
     {
-        <p>[DEBUG] Load More Button should be hidden</p>
+        <p>End of search.</p>
     }
 }
 
@@ -161,7 +160,14 @@ else if (hasMatched && matchingSets.Count > 0)
             }
         </tbody>
     </table>
-    <button class="btn btn-secondary" @onclick="LoadMoreMatchingSets" disabled="@isLoadingMoreMatches || !hasMoreMatchingSets" style="margin: 10px;">Load More Matches</button>
+    @if (hasMoreMatchingSets)
+    {
+        <button class="btn btn-secondary" @onclick="LoadMoreMatchingSets" style="margin: 10px;">Load More Matches</button>
+    }
+    else
+    {
+        <p>No more matching sets found.</p>
+    }
 }
 
 
