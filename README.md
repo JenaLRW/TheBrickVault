@@ -65,6 +65,8 @@ OR (Not recommended)
 - Click on Find Matching Sets.
   - If the database has a very high number of parts, the API potentially will be called too much and you will get a "Too many requests" failure. *I am working very diligently to find an optimization that will perform well with the app*
 
+
+
 ## Improvements Needed
 
 - Unit tests
@@ -74,10 +76,15 @@ OR (Not recommended)
 - Follow SOLID principles more closely
 - Categorize sets to match user's parts by theme
 
+## API Integration Challenges
+
+During the development of this project, I initially aimed to integrate external API calls to retrieve data for certain functionality. However, I encountered performance limitations due to the sheer size of the API being used. The scale of the data proved to be too large for real-time API calls, which impacted the efficiency of my project.
+
+To address this issue, I am in the process of importing the necessary data directly into the project and storing it in the database. This will allow me to eliminate the dependency on the external API for large data retrieval and improve overall performance while maintaining the required functionality.
 
 
 
-
+### Acknowledgements
 
 Many many many thanks to Code:You and their staff and mentors for their guidance: Jenny Terry, August Mapp, Brian Luerman, Chris Metcalfe, Charles Kayser, and Michael Paddock. A few international friends as well. 
 
