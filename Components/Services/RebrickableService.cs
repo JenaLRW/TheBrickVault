@@ -114,6 +114,7 @@ namespace TheBrickVault.Components.Services
                 DbLegoPart newLegoParts = new DbLegoPart
                 {
                     SetNum = setNum,
+                    PartNum = part.part_num,
                     InvPartId = part.inv_part_id,
                     Quantity = part.quantity
                 };
