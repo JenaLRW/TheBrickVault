@@ -71,6 +71,10 @@ namespace TheBrickVault.Components.Services
 
         
 
+
+
+
+
         private async Task<List<RebrickableLegoSet>> SearchLegoSetsAsync(string searchQuery, int currentPage = 1, int resultsPerPage = 10)
         {
             Console.WriteLine($"[DEBUG] SearchLegoSetsAsync: Searching for sets with query '{searchQuery}'.");
@@ -105,26 +109,33 @@ namespace TheBrickVault.Components.Services
 
         public async Task<List<RebrickableLegoPart>> FetchPartsForSetsAsync(string setNum)   //fetch parts for a specific set from Rebrickable's API.
         {
-            var url = $"{BaseUrl}{setNum}/parts/?key={_apiKey}";
-            var response = await _clientFactory.CreateClient().GetFromJsonAsync<RebrickablePartsResult>(url);
-            var parts = response?.Results ?? new List<RebrickableLegoPart>();
-
-            foreach (var part in parts)
+            var allParts = new List<RebrickableLegoPart>();
+            string url = $"{BaseUrl}{setNum}/parts/?key={_apiKey}";
+            do
             {
-                DbLegoPart newLegoParts = new DbLegoPart
+                var response = await _clientFactory.CreateClient().GetFromJsonAsync<RebrickablePartsResult>(url);
+                if (response == null) break;
+
+                allParts.AddRange(response.Results ?? new List<RebrickableLegoPart>());
+                url = response.Next;
+            } while (!string.IsNullOrEmpty(url));
+            foreach (var part in allParts)
+            {
+                DbLegoPart newLegoPart = new DbLegoPart
                 {
                     SetNum = setNum,
                     PartNum = part.part_num,
                     InvPartId = part.inv_part_id,
                     Quantity = part.quantity
                 };
-                await _dbContext.DbLegoParts.AddAsync(newLegoParts);
-
-                await _dbContext.SaveChangesAsync();
-
+                await _dbContext.DbLegoParts.AddAsync(newLegoPart);
             }
-            return parts;
+            await _dbContext.SaveChangesAsync();
+            return allParts;
         }
+    
+
+
 
 
 
@@ -135,7 +146,11 @@ namespace TheBrickVault.Components.Services
         public class RebrickablePartsResult
         {
             public List<RebrickableLegoPart> Results { get; set; } = new();
+            public string? Next { get; set; }
         }
+
+
+
 
 
 
@@ -162,7 +177,7 @@ namespace TheBrickVault.Components.Services
 
             var userParts = await GetUserPartsAsync(); //fetch user's parts from GetUserPartsAsync()
 
-            Console.WriteLine($"[DEBUG] User has {userParts.Count} parts.");
+            Console.WriteLine($"[DEBUG] User has {userParts.Values.Sum(q => q ?? 0)} parts.");
 
             var allDtoSetsWithParts = await FetchAllSetsAndPartsAsync(currentPage, resultsPerPage);
 
@@ -223,6 +238,9 @@ namespace TheBrickVault.Components.Services
         {
             return _dbContext.DbLegoParts.Sum(p => p.Quantity) ?? 0;
         }
+
+
+
 
 
 
