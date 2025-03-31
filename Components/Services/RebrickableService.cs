@@ -171,66 +171,7 @@ namespace TheBrickVault.Components.Services
 
        
 
-        public async Task<List<RebrickableLegoSetWithParts>> FindMatchingSetsAsync(int currentPage = 1, int resultsPerPage = 1000)
-        {
-            Console.WriteLine("[DEBUG] FindMatchingSetsAsync started.");
-
-            var userParts = await GetUserPartsAsync(); //fetch user's parts from GetUserPartsAsync()
-
-            Console.WriteLine($"[DEBUG] User has {userParts.Values.Sum(q => q ?? 0)} parts.");
-
-            var allDtoSetsWithParts = await FetchAllSetsAndPartsAsync(currentPage, resultsPerPage);
-
-            Console.WriteLine($"[DEBUG] Found {allDtoSetsWithParts.Count} sets from Rebrickable on page {currentPage}.");
-
-            var matchingSets = new List<RebrickableLegoSetWithParts>();
-
-            foreach (var setWithParts in allDtoSetsWithParts) //Filtering logic
-            {
-                Console.WriteLine($"[DEBUG] Set Name: {setWithParts.Set.name}, Parts: {setWithParts.Set.num_parts}");
-
-                if (setWithParts.Set.num_parts <= 30)
-                {
-                    Console.WriteLine($"[DEBUG] Skipping set {setWithParts.Set.name} because it has too few parts.");
-                    continue;
-                }
-
-                string setNameLower = setWithParts.Set.name.ToLower();
-                if (setNameLower.Contains("minifigs") ||
-                    setNameLower.Contains("Figures") ||
-                    setNameLower.Contains("duplo") ||
-                    setNameLower.Contains("pack") ||
-                    setNameLower.Contains("dots") ||
-                    setNameLower.Contains("assorted") ||
-                    setNameLower.Contains("1:87"))
-
-                {
-                    Console.WriteLine($"[DEBUG] Skipping set {setWithParts.Set.name}.");
-                    continue;
-                }
-
-
-                bool partsMatch = true;
-
-                foreach (var part in setWithParts.Parts)
-                {
-                    if (!userParts.TryGetValue(part.inv_part_id, out int? userQuantity) || userQuantity < part.quantity)
-                    {
-                        partsMatch = false;
-                        break;
-                    }
-                }
-                if (partsMatch)
-                {
-                    Console.WriteLine($"[DEBUG] Found matching set: {setWithParts.Set.name}");
-                    matchingSets.Add(setWithParts);
-                }
-            }
-
-            Console.WriteLine($"[DEBUG] Found {matchingSets.Count} sets from Rebrickable.");
-            return matchingSets;                    
-    
-        }
+        
 
 
 

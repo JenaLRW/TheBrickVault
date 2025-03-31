@@ -4,11 +4,12 @@
 @using TheBrickVault.Core.DTO
 
 
+
 @page "/"
 @rendermode InteractiveServer
 @inject LegoDbContext DbContext
 @inject RebrickableService RebrickableService
-
+@inject ImportService ImportService
 
 <h3>The Brick Vault</h3>
 <h6>Jena White's Capstone Project</h6>
@@ -241,7 +242,7 @@ else if (hasMatched && matchingSets.Count > 0)
         currentPage++;
 
         var moreSets = await RebrickableService.FetchSetsAndPartsAsync(searchQuery, currentPage + 1, 10);
-                
+
         if (moreSets.Count < 10)
         {
             hasMoreSets = false;
@@ -258,20 +259,20 @@ else if (hasMatched && matchingSets.Count > 0)
 
 
 
+    //private List<RebrickableLegoSetWithParts> matchingSets = new();
 
 
-
-    private async Task FindMatchingSets()
+    private async Task FindMatchingSets() //this method is triggered when the user clicks the find matching sets button, NOT AN API CALL
     {
-        isLoadingMatches = true;
-        currentMatchingPage = 2;
+        isLoadingMatches = true;        
         matchingSets.Clear();
         hasMoreMatchingSets = true;
 
-        var initialMatchingSets = await RebrickableService.FindMatchingSetsAsync(currentMatchingPage, 1000);
-        matchingSets.AddRange(initialMatchingSets);
+        var importedSets = await ImportService.FindMatchingImportedSetsAsync();
 
-        if (initialMatchingSets.Count < 10)
+        matchingSets.AddRange(importedSets);
+
+        if (importedSets.Count < 10)
         {
             hasMoreMatchingSets = false;
         }
@@ -378,6 +379,6 @@ else if (hasMatched && matchingSets.Count > 0)
         await LoadUserLegoSets();
     }
 
-    private List<RebrickableLegoSetWithParts> matchingSets = new();
+    
 
    }

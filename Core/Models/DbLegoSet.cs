@@ -12,10 +12,12 @@ namespace TheBrickVault.Core.Models
         public int Id { get; set; } 
         public string? Name { get; set; }
         public string SetNum { get; set; }   
-        public string? Images { get; set; }  
+        
         public int? PieceCount { get; set; }
-        public int? Instructions { get; set; } 
-        public int? PartsList { get; set; } 
+        public int? Instructions { get; set; }
+
+        //public string? Images { get; set; }  
+        //public int? PartsList { get; set; } 
         public ICollection<DbLegoPart> ListOfParts { get; set; } = new List<DbLegoPart>(); //this is a navigation property to DbLegoPart.
 
     }

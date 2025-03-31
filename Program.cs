@@ -6,6 +6,7 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using TheBrickVault.Infrastructure;
 using TheBrickVault.Components.Services;
+using TheBrickVault.Components;
 
 //This is the entry point for the app.  Configures services (EF Core with SQLite, HttpClient, DI, etc). 
 //Sets up Blazor's rendering mode. Registers Rebrickable's API integration components. 
@@ -34,6 +35,9 @@ namespace TheBrickVault
             //Database file
             builder.Services.AddDbContext<LegoDbContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+            
+
+            
 
             //LegoSetService API Key configuration, methods, and database access
             builder.Services.AddScoped<RebrickableService>();
@@ -61,14 +65,18 @@ namespace TheBrickVault
             //add services to the container - this is for User Secrets Configuration setup
             builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
+
+            builder.Services.AddScoped<ImportService>();
+
             var app = builder.Build();
 
-            //using (var scope = app.Services.CreateScope())
-            //{
-            //    var dbContext = scope.ServiceProvider.GetRequiredService<LegoDbContext>();
-            //    DbInitializer.Initialize(dbContext);
-            //}
-            
+            using (var scope = app.Services.CreateScope())
+            {
+                var importService = scope.ServiceProvider.GetRequiredService<ImportService>();
+                await importService.ImportDataAsync();
+                
+            }
+
             //HTTP request pipeline
             if (app.Environment.IsDevelopment())
             {

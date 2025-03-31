@@ -2,8 +2,11 @@
 {
     public class Imported_Inventories
     {
-        public int Id { get; set; } 
+        [CsvHelper.Configuration.Attributes.Index(0)]
+        public int Id { get; set; }
+        [CsvHelper.Configuration.Attributes.Index(1)]
         public string? version { get; set; }
+        [CsvHelper.Configuration.Attributes.Index(2)]
         public string set_num { get; set; }
 
         public Imported_sets Set { get; set; }
