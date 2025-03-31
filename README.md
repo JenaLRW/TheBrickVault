@@ -31,8 +31,14 @@ FYI, code contains a lot of comments. Without comments, I will get lost and unfo
 
 Firefox may give you some drama. Google handles it better. Enter at your own risk. 
 
+Capstone Project was due on March 28th, 2025 at noon.  I have made some changes since then and as of today, March 31st, the new changes are not ready.  
+- On this page at the top, please click on "### Commits", scroll down to March 28, 2025 and find the commit message "Added API Integration Challenges".
+- To the right, there is a < > button, that will allow you to browse the repo at that commit.
+- Click on the < >.
+- Clone the app from there.  Thank you!
 
-### Download Git LFS
+------------------------
+### Download Git LFS (ONLY FOR COMMITS AFTER MARCH 28TH)
 This project uses Git Large File Storage. Download Git LFS before cloning the repo and running the build. 
 
 Windows:
@@ -42,6 +48,8 @@ macOS:
 - You can install Git LFS using Homebrew by running the following command in your terminal: ```brew install git-lfs```
 
 After download, initalize Git LFS in the local repo, run the following command to initialize: ```git lfs install```
+
+------------------------
 
 Clone the repo: ```git clone github.com/JenaLRW/TheBrickVault```
 
