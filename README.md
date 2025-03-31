@@ -50,6 +50,7 @@ macOS:
 After download, initalize Git LFS in the local repo, run the following command to initialize: ```git lfs install```
 
 Clone the repo: ```git clone github.com/JenaLRW/TheBrickVault```
+
 ------------------------
 
 ### Run the build
