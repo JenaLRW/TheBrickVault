@@ -407,3 +407,5 @@ FodyWeavers.xsd
 # Database files
 .db-shm
 .db-wal
+.db
+.sqlite
