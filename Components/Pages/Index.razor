@@ -241,7 +241,7 @@ else if (hasMatched && matchingSets.Count > 0)
         currentPage++;
 
         var moreSets = await RebrickableService.FetchSetsAndPartsAsync(searchQuery, currentPage + 1, 10);
-
+                
         if (moreSets.Count < 10)
         {
             hasMoreSets = false;
@@ -293,7 +293,7 @@ else if (hasMatched && matchingSets.Count > 0)
         isLoadingMoreMatches = true;
         currentMatchingPage++;
         var moreMatchingSets = await RebrickableService.FindMatchingSetsAsync(currentMatchingPage, 1000);
-
+        
         if (moreMatchingSets.Count == 0)
         {
             hasMoreMatchingSets = false;
@@ -307,7 +307,7 @@ else if (hasMatched && matchingSets.Count > 0)
 
     }
 
-
+    
 
 
 
@@ -327,7 +327,7 @@ else if (hasMatched && matchingSets.Count > 0)
         await LoadUserLegoSets();
     }
 
-
+    
 
 
 
@@ -350,7 +350,7 @@ else if (hasMatched && matchingSets.Count > 0)
     }
 
 
-
+     
 
 
 
@@ -362,7 +362,7 @@ else if (hasMatched && matchingSets.Count > 0)
         userLegoSets = await DbContext.DbLegoSets.ToListAsync();
     }
 
-
+    
 
 
 

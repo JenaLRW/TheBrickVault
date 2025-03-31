@@ -11,7 +11,7 @@ namespace TheBrickVault.Infrastructure.Data
     public class LegoDbContext : DbContext
     {
         public LegoDbContext(DbContextOptions<LegoDbContext> options) : base(options) { }
-        
+
         public DbSet<DbLegoSet> DbLegoSets { get; set; }
         public DbSet<DbLegoPart> DbLegoParts { get; set; }
         public DbSet<Imported_sets> ImportedSets { get; set; }
@@ -53,14 +53,14 @@ namespace TheBrickVault.Infrastructure.Data
                 .WithMany()
                 .HasForeignKey(i => i.inventory_id)
                 .OnDelete(DeleteBehavior.Cascade);
-
+           
             modelBuilder.Entity<Imported_inventory_sets>()
                 .HasOne<Imported_sets>()
                 .WithMany()
                 .HasForeignKey(i => i.set_num)
                 .OnDelete(DeleteBehavior.Cascade);
         }
-
+            
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)

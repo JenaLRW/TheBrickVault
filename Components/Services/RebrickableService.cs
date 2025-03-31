@@ -113,7 +113,7 @@ namespace TheBrickVault.Components.Services
             string url = $"{BaseUrl}{setNum}/parts/?key={_apiKey}";
             do
             {
-                var response = await _clientFactory.CreateClient().GetFromJsonAsync<RebrickablePartsResult>(url);
+            var response = await _clientFactory.CreateClient().GetFromJsonAsync<RebrickablePartsResult>(url);
                 if (response == null) break;
 
                 allParts.AddRange(response.Results ?? new List<RebrickableLegoPart>());
@@ -151,7 +151,7 @@ namespace TheBrickVault.Components.Services
 
 
 
-
+        
 
 
         
