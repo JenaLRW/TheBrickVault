@@ -54,13 +54,16 @@ OR (Not recommended)
 - Manually add the API key to SearchLegoSetsAsync and FetchPartsForSetsAsync methods in the RebrickableService.cs file. Replace the placeholder ```{_apiKey}``` with the actual API key.
 
 ### Test run data
-- In the first search bar to look up Lego Sets
-  - Enter "71043" (Hogwarts Castle - has quite a bit of parts)
+- In the first search bar to look up Lego Sets, to play it safe:
+  - Enter "1234"
+  - Save sets "Bumblebee Helicopter" and "Sensi Wu Fun Pack"
+  - Enter "Race Car" (just to show the search can use names instead of set numbers.)
+  - Click on Find Matching Sets. *You should see some results but they're very incorrect.  Debugging this has been a nightmare and I could not solve the bugs in time.  Apparently, there are a million ways to debug and I haven't found the one yet.*
+- If you're feel like pushing the limits, try this:
+  - Enter "71043" or "Hogwarts Castle"  (has quite a bit of parts, a bit problematic)
   - Click on save.
-  - Enter "Race Car"
-  - Click on save on a set with more than 0 pieces.
-- Click on Find Matching Sets.
-  - If the database has a very high number of parts, the API potentially will be called too much and you will get a "Too many requests" failure. *I am working very diligently to find an optimization that will perform well with the app*
+  - Click on Find Matching Sets.
+  - If the database has a very high number of parts, the API potentially will be called too much and you will get a "Too many requests" failure. *I am working very diligently to find an optimization that will perform well with the app.*
 
 
 
