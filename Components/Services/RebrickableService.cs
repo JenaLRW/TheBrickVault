@@ -71,6 +71,10 @@ namespace TheBrickVault.Components.Services
 
         
 
+
+
+
+
         private async Task<List<RebrickableLegoSet>> SearchLegoSetsAsync(string searchQuery, int currentPage = 1, int resultsPerPage = 10)
         {
             Console.WriteLine($"[DEBUG] SearchLegoSetsAsync: Searching for sets with query '{searchQuery}'.");
@@ -103,7 +107,8 @@ namespace TheBrickVault.Components.Services
 
 
 
-        public async Task<List<RebrickableLegoPart>> FetchPartsForSetsAsync(string setNum)   //fetch parts for a specific set from Rebrickable's API.
+
+        public async Task<List<RebrickableLegoPart>> FetchPartsForSetsAsync(string setNum)
         {
             var url = $"{BaseUrl}{setNum}/parts/?key={_apiKey}";
             var response = await _clientFactory.CreateClient().GetFromJsonAsync<RebrickablePartsResult>(url);
@@ -111,19 +116,53 @@ namespace TheBrickVault.Components.Services
 
             foreach (var part in parts)
             {
-                DbLegoPart newLegoParts = new DbLegoPart
+                var existingPart = await _dbContext.DbLegoParts
+                    .FirstOrDefaultAsync(p => p.InvPartId == part.inv_part_id && p.SetNum == setNum);
+
+                if (existingPart != null)
                 {
-                    SetNum = setNum,
-                    InvPartId = part.inv_part_id,
-                    Quantity = part.quantity
-                };
-                await _dbContext.DbLegoParts.AddAsync(newLegoParts);
-
-                await _dbContext.SaveChangesAsync();
-
+                    existingPart.Quantity += part.quantity; // Update quantity instead of inserting a duplicate
+                }
+                else
+                {
+                    _dbContext.DbLegoParts.Add(new DbLegoPart
+                    {
+                        SetNum = setNum,
+                        InvPartId = part.inv_part_id,
+                        Quantity = part.quantity
+                    });
+                }
             }
+
+            await _dbContext.SaveChangesAsync(); // Save changes once after all updates
+            Console.WriteLine($"[DEBUG] FetchPartsForSetsAsync: {setNum} returned {parts.Count} parts.");
+
             return parts;
         }
+
+
+
+        //public async Task<List<RebrickableLegoPart>> FetchPartsForSetsAsync(string setNum)   //fetch parts for a specific set from Rebrickable's API.
+        //{
+        //    var url = $"{BaseUrl}{setNum}/parts/?key={_apiKey}";
+        //    var response = await _clientFactory.CreateClient().GetFromJsonAsync<RebrickablePartsResult>(url);
+        //    var parts = response?.Results ?? new List<RebrickableLegoPart>();
+
+        //    foreach (var part in parts)
+        //    {
+        //        DbLegoPart newLegoParts = new DbLegoPart
+        //        {
+        //            SetNum = setNum,
+        //            InvPartId = part.inv_part_id,
+        //            Quantity = part.quantity
+        //        };
+        //        await _dbContext.DbLegoParts.AddAsync(newLegoParts);
+
+        //        await _dbContext.SaveChangesAsync();
+
+        //    }
+        //    return parts;
+        //}
 
 
 
@@ -138,22 +177,39 @@ namespace TheBrickVault.Components.Services
 
 
 
-        
-        public async Task<Dictionary<int, int?>> GetUserPartsAsync()   //Query User's parts from DbLegoParts table
-        
+
+
+
+
+
+        public async Task<Dictionary<int, int?>> GetUserPartsAsync()
         {
             var parts = await _dbContext.DbLegoParts
-                .GroupBy(p => p.InvPartId) 
-                .Select(g => new { InvPartId = g.Key, Quantity = g.Sum(p => p.Quantity ?? 0) }) 
-                .ToListAsync(); 
+                .GroupBy(p => p.InvPartId)
+                .Select(g => new {
+                    InvPartId = g.Key,
+                    Quantity = g.Sum(p => p.Quantity ?? 0)  // Ensure NULL is treated as 0
+                })
+                .ToListAsync();
 
-            return parts.ToDictionary(p => p.InvPartId, p => (int?)p.Quantity); 
+            return parts.ToDictionary(p => p.InvPartId, p => (int?)p.Quantity);
         }
 
+        //public async Task<Dictionary<int, int?>> GetUserPartsAsync()   //Query User's parts from DbLegoParts table
+
+        //{
+        //    var parts = await _dbContext.DbLegoParts
+        //        .GroupBy(p => p.InvPartId) 
+        //        .Select(g => new { InvPartId = g.Key, Quantity = g.Sum(p => p.Quantity ?? 0) }) 
+        //        .ToListAsync(); 
+
+        //    return parts.ToDictionary(p => p.InvPartId, p => (int?)p.Quantity); 
+        //}
 
 
 
-       
+
+
 
         public async Task<List<RebrickableLegoSetWithParts>> FindMatchingSetsAsync(int currentPage = 1, int resultsPerPage = 1000)
         {
